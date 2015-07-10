@@ -22,8 +22,6 @@ echo '<form action="CourseFinder.php">
  		$day = $_GET['day1'];
  		$start = $_GET['start1'];
  		$end = $_GET['end1'];
-
- 		Chromephp::log("the delete button was pressed");
  		 Course_Cart($course, $section, $type, $day, $start, $end, 'delete');
  	}
 
@@ -44,10 +42,7 @@ echo '<form action="CourseFinder.php">
 // if session variables are set and the button was pressed...
 if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']))
 {
-	Chromephp::log("the session variables has been set");
-		
-
-		// if the button was pressed reset...
+	//Chromephp::log("the session variables has been set");
 	if (isset($_GET['CourseSubj']) || isset($_GET['CourseNumb'])) {
 		$_SESSION['CourseSubj'] = $_GET['CourseSubj'];  // reset the session variables...
 		$_SESSION['CourseNumb'] = $_GET['CourseNumb'];
@@ -56,8 +51,8 @@ if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']))
 	$course = $_SESSION['CourseSubj'];
  	$numb = $_SESSION['CourseNumb'];
  	
- 	Chromephp::log($course);
- 	Chromephp::log($numb);
+ 	//Chromephp::log($course);
+ 	//Chromephp::log($numb);
 
  	// save this to the session...
  	find_courses_and_display($course, $numb);
@@ -65,9 +60,9 @@ if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']))
 // only one of these needs to run...
  if (isset($_GET['CourseSubj']) || isset($_GET['CourseNumb'])) {
 	
-	Chromephp::log("wow");
- 	Chromephp::log($_GET['CourseSubj']);
- 	Chromephp::log($_GET['CourseNumb']); 
+	//Chromephp::log("wow");
+ 	//Chromephp::log($_GET['CourseSubj']);
+ 	//Chromephp::log($_GET['CourseNumb']); 
  	// save the courses to the session and we can just render them again...
 
  	$course = $_GET['CourseSubj'];
@@ -139,7 +134,7 @@ for($x = 2; $x < count($outputSplit); $x++){
 	
 	// now substring by three to get the section number... 
 	$outputSplit2 = substr($outputSplit1[2], 5);	// this is going to get rid of the course number... 
-	Chromephp::log($outputSplit2);
+	//Chromephp::log($outputSplit2);
 	// grab the section number first and then spit it up by <td>.... 
 
 	$section = substr($outputSplit2, 0, 3); // this gets the section... 
@@ -152,7 +147,7 @@ for($x = 2; $x < count($outputSplit); $x++){
 
 	// we need to go through outputSplit 3 ... 
 
-	Chromephp::log($outputSplit3);
+	//Chromephp::log($outputSplit3);
 
 	for ($r = 0; $r < count($outputSplit3); $r++){
 
@@ -226,9 +221,9 @@ for($x = 2; $x < count($outputSplit); $x++){
 		}
 	}
 
-	Chromephp::log($day);
-	Chromephp::log($start);
-	Chromephp::log($end);
+	//Chromephp::log($day);
+	//Chromephp::log($start);
+	//Chromephp::log($end);
 	$CourseParts = array (
     "Section"  => $section,	// this will give the actual number 101, 102, l1b etc...
     "Type" => $type,  // this will describe whether this is a lecture, lab, or waiting list.
@@ -237,7 +232,7 @@ for($x = 2; $x < count($outputSplit); $x++){
     "End" => $end
 	);
 
-	Chromephp::log($CourseParts);
+	//Chromephp::log($CourseParts);
 	array_push($Courses, $CourseParts); 
 //	Chromephp::log($Courses);	 
 }
@@ -251,7 +246,7 @@ CourseDisplayer($Courses, $CourseSubj, $CourseNumb);
 function CourseDisplayer($courses, $coursesubj, $coursenumb){
 
 
-	Chromephp::log($courses);
+	//Chromephp::log($courses);
 
 	// we have to loop through all the courses... 
 		echo "<table border='1' style='width:100%''>";
@@ -304,13 +299,13 @@ function CourseDisplayer($courses, $coursesubj, $coursenumb){
 // one variable that says either it is a delete or it is an add...
 function Course_Cart($Course, $currentsection, $currenttype, $currentday, $currentstart, $currentend, $option){
 
-	Chromephp::log($Course);
+	/*Chromephp::log($Course);
 	Chromephp::log($currentsection);
 	Chromephp::log($currenttype);
 	Chromephp::log($currentday);
 	Chromephp::log($currentstart);
 	Chromephp::log($currentend);
-	Chromephp::log("blah");
+	Chromephp::log("blah");*/
 	// now lets show this... 
 	echo "Courses Cart: ";
 
@@ -336,20 +331,27 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 		array_push($cart, $course_info_array);
 		}
 
+		
+		// we need to reset the session variable...
 		if ($option == 'delete'){
-			// we would want to go through cart and find the exact thing to delete... 
-
 			for($t = 0; $t < count($cart); $t++){
-				// for every variable try and match every single element... 
-				// this is not working...
-				if($key = array_keys($cart[$t], $course_info_array) !== false){
-					Chromephp::log("we are going through the delete button right ow");
-					Chromephp::log($cart[$t]);
-					unset($cart[$t][$key]);
+				
+				if($cart[$t]['section'] == $currentsection &&
+					$cart[$t]['course'] == $Course &&
+					$cart[$t]['type'] == $currenttype &&
+					$cart[$t]['currentday'] == $currentday &&
+					$cart[$t]['currentstart'] == $currentstart &&
+					$cart[$t]['currentend'] == $currentend
+					){
+						unset($cart[$t]);
+						$cart = array_values($cart);
+						// need to shift everything down once we unset it...
+						// everything that is greater then t we need to shift down one...
+						//for ($y = $t; $y<count($cart); $y++) {
+					//		Chromephp::log("this loop is going");
+				//			$cart[$y] = $cart[$y+1];
+			//			}
 				}
-
-
-
 			}
 
 			}
@@ -402,19 +404,24 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 }
 
 
-
+// this displays the course displayer...
 function Course_Cart_Displayer(){
 
 	$cart = $_SESSION['cart'];
-
+	Chromephp::log($cart);
 
 	echo "<table>";
 
 	for($x = 0; $x < count($cart); $x++){
 
-		// go through each of these and show them...
+		//Chromephp::log($x);	
+		//Chromephp::log($cart[$x]);
+		if(is_null($cart[$x])){
+
+			continue;
+		}
 		$currentCourse = $cart[$x]; 
-		Chromephp::log($currentCourse['course']);
+		//Chromephp::log($currentCourse['course']);
 		$Course1 = $currentCourse['course'];
 		$currentsection1 = $currentCourse['section'];
 		$currenttype1 = $currentCourse['type'];
