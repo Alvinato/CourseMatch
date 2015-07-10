@@ -1,0 +1,262 @@
+<form method="POST" action="/cs/main#search_results" onsubmit="return validate('SECT_SEARCH_TIMES');" name="sect_srch_criteria_simp_search" class="form-horizontal">
+<script language="JavaScript">
+  function clickDistanceEducation() {
+    document.sect_srch_criteria_simp_search.actv.options[0].selected = true;
+    if (document.sect_srch_criteria_simp_search.DISTANCE_EDUCATION.checked) {
+      document.sect_srch_criteria_simp_search.actv.disabled = true;
+    } else {
+      document.sect_srch_criteria_simp_search.actv.disabled = false;
+    }
+  }
+</script>
+<div class="container-fluid">
+<div class="row-fluid">
+    <div class="span9">
+
+			<fieldset>
+				<legend>Search Criteria</legend>
+				<div class="control-group">
+				    <label class="control-label" for="subj">
+				    <a href="/static/courseschedule/cs_glossary.htm#crs_srch_subject" target="students" onmouseover="displayHelpText('This will search through the subject codes of all UBC courses.',235,160,event,'Subject Area')" onmouseout="closePopup();">
+				    <i class="icon-question-sign"></i></a>&nbsp;&nbsp;
+				    Subject Area:</label>
+				    <div class="controls">
+				      <input type="text" size="6" id="subj" name="subj" value="" placeholder="eg. ENGL or EN*">
+				      <span class="help-inline">(eg. ENGL or EN*)</span>
+				    </div>
+				</div>
+				<div class="control-group">
+				    <label class="control-label" for="crsno">
+				    <a href="/static/courseschedule/cs_glossary.htm#crs_srch_courseno" target="students" onmouseover="displayHelpText('This will allow you to specify a full or partial course number to search for.',235,160,event,'Course Number')" onmouseout="closePopup();">
+				    <i class="icon-question-sign"></i></a>&nbsp;&nbsp;
+				    Course Number:</label>
+				    <div class="controls">
+				      <input type="text" size="6" id="crsno" name="crsno" value="" placeholder="eg. 110 or 1*">
+				      <span class="help-inline">(eg. 110 or 1*)</span>
+				    </div>
+				</div>
+				<div class="control-group">
+				    <label class="control-label" for="SECTION_SEARCH_KEYWORD">
+				    <a href="/static/courseschedule/cs_glossary.htm#crs_srch_keyword" target="students" onmouseover="displayHelpText('This will search the title and description of all UBC courses.',235,160,event,'Keyword(s)')" onmouseout="closePopup();">
+				    <i class="icon-question-sign"></i></a>&nbsp;&nbsp;
+				    Keyword(s):</label>
+				    <div class="controls">
+				      <input type="text" size="15" id="SECTION_SEARCH_KEYWORD" name="SECTION_SEARCH_KEYWORD" value="">
+				    </div>
+				</div>
+				<div class="control-group">
+				    <label class="control-label" for="actv">
+				    <a href="/static/courseschedule/cs_glossary.htm#crs_srch_activity" target="students" onmouseover="displayHelpText('This will allow you to select the type of course to search for. (e.g. Lecture, Tutorial, etc.)',235,160,event,'Activity Type')" onmouseout="closePopup();">
+				    <i class="icon-question-sign"></i></a>&nbsp;&nbsp;
+				    Activity Type:</label>
+				    <div class="controls">
+							<select name="actv" id="actv">
+							
+							 <option value="--Any--">--Any--</option>
+							
+							 <option value="Lecture                                           ">Lecture                                           </option>
+							
+							 <option value="Laboratory                                        ">Laboratory                                        </option>
+							
+							 <option value="Seminar                                           ">Seminar                                           </option>
+							
+							 <option value="Tutorial                                          ">Tutorial                                          </option>
+							
+							 <option value="Waiting List                                      ">Waiting List                                      </option>
+							
+							 <option value="Discussion                                        ">Discussion                                        </option>
+							
+							 <option value="Directed Studies                                  ">Directed Studies                                  </option>
+							
+							 <option value="Thesis                                            ">Thesis                                            </option>
+							
+							 <option value="Work Placement                                    ">Work Placement                                    </option>
+							
+							 <option value="Practicum                                         ">Practicum                                         </option>
+							
+							 <option value="Lecture-Laboratory                                ">Lecture-Laboratory                                </option>
+							
+							 <option value="Studio                                            ">Studio                                            </option>
+							
+							 <option value="Web-Oriented Course                               ">Web-Oriented Course                               </option>
+							
+							 <option value="Rehearsal                                         ">Rehearsal                                         </option>
+							
+							 <option value="Exchange Program                                  ">Exchange Program                                  </option>
+							
+							 <option value="Workshop                                          ">Workshop                                          </option>
+							
+							 <option value="Essay/Report                                      ">Essay/Report                                      </option>
+							
+							 <option value="Project                                           ">Project                                           </option>
+							
+							 <option value="Problem Session                                   ">Problem Session                                   </option>
+							
+							 <option value="Lecture-Seminar                                   ">Lecture-Seminar                                   </option>
+							
+							 <option value="Lab-Seminar                                       ">Lab-Seminar                                       </option>
+							
+							 <option value="Lecture-Discussion                                ">Lecture-Discussion                                </option>
+							
+							 <option value="Flexible Learning                                 ">Flexible Learning                                 </option>
+							
+							 <option value="Reserved Section                                  ">Reserved Section                                  </option>
+							
+							 <option value="Optional Section                                  ">Optional Section                                  </option>
+							
+							 <option value="Research                                          ">Research                                          </option>
+							
+							 <option value="Field Trip                                        ">Field Trip                                        </option>
+							
+							</select>
+				    </div>
+				</div>
+				<div class="control-group">
+				    <label class="control-label" for="credit">
+				    <a href="/static/courseschedule/cs_glossary.htm#crs_srch_credit" target="students" onmouseover="displayHelpText('This will allow you to specify a number of course credits to search for.',235,160,event,'Credits')" onmouseout="closePopup();">
+				    <i class="icon-question-sign"></i></a>&nbsp;&nbsp;
+				    Credits:</label>
+				    <div class="controls">
+				      <input type="text" size="4" maxlength="4" id="credit" name="credit" value="">
+				    </div>
+				</div>
+				<div class="control-group">
+				    <label class="control-label" for="term">
+				    <a href="/static/courseschedule/cs_glossary.htm#crs_srch_term" target="students" onmouseover="displayHelpText('This will allow you to search for a course within a specific term of a session.',235,160,event,'Term')" onmouseout="closePopup();">
+				    <i class="icon-question-sign"></i></a>&nbsp;&nbsp;
+				    Term:</label>
+				    <div class="controls">
+				      <select name="term" id="term">
+							
+				        <option value="--Any--">--Any--</option>
+							
+				        <option value="Term 1">Term 1</option>
+							
+				        <option value="Term 2">Term 2</option>
+							
+				        <option value="Term 1-2">Term 1-2</option>
+							
+				      </select>
+				    </div>
+				</div>
+				
+				
+				  
+				
+				
+				
+				<div class="control-group">
+				    <label class="control-label" for="seat">
+				    <a href="/static/courseschedule/cs_glossary.htm#crs_srch_status" target="students" onmouseover="displayHelpText('The status of a course refers to whether the course has seats available or whether it is full. You can use the status box to filter down your search in the section search area by selecting *has seats available* in the drop down.',235,160,event,'Status')" onmouseout="closePopup();">
+				    <i class="icon-question-sign"></i></a>&nbsp;&nbsp;
+				    Status:</label>
+				    <div class="controls">
+				      <select name="seat" id="seat">
+				      
+				        <option value="--Any--">--Any--</option>
+							
+				        <option value="Has seats available">Has seats available</option>
+							
+				      </select>
+				    </div>
+				</div>
+				
+				<div class="control-group">
+				    <label class="control-label" for="sTime">
+				    <a href="/static/courseschedule/cs_glossary.htm#crs_srch_time" target="students" onmouseover="displayHelpText('This allows you to search for courses that meets between two specific times of the day.',235,160,event,'Available Times')" onmouseout="closePopup();">
+				    <i class="icon-question-sign"></i></a>&nbsp;&nbsp;
+				    Available Times:</label>
+				    <div class="controls">
+				      <input type="text" class="input-small" name="sTime" value=""> 
+				      - 
+				      <input type="text" class="input-small" name="eTime" value=""> 
+				      <span class="help-inline">(24 Hr format)</span>
+				    </div>
+				</div>
+				<div class="control-group">
+				  <label class="control-label">
+				  <a href="/static/courseschedule/cs_glossary.htm#crs_srch_day" target="students" onmouseover="displayHelpText('This allows you to search for courses that meet on specific days of the week.',235,160,event,'Available Days')" onmouseout="closePopup();">
+				  <i class="icon-question-sign"></i></a>&nbsp;&nbsp;
+				  Available Days:</label>
+				  
+				  <div class="controls">
+						<label class="checkbox inline">
+						  <input type="CHECKBOX" value="True" name="DAY1"> Su
+						</label>
+						<label class="checkbox inline">
+					    <input type="CHECKBOX" value="True" name="DAY2"> M
+					  </label>
+					  <label class="checkbox inline">
+					    <input type="CHECKBOX" value="True" name="DAY3"> T
+					  </label>
+					  <label class="checkbox inline">
+					    <input type="CHECKBOX" value="True" name="DAY4"> W
+					  </label>
+					  <label class="checkbox inline">
+					    <input type="CHECKBOX" value="True" name="DAY5"> Th
+					  </label>
+					  <label class="checkbox inline">
+					    <input type="CHECKBOX" value="True" name="DAY6"> F
+					  </label>
+					  <label class="checkbox inline">
+					    <input type="CHECKBOX" value="True" name="DAY7"> Sa
+					  </label>
+				  </div>
+				</div>
+				<div class="control-group">
+				    <label class="" for="MUST_MATCH">
+				    <a href="/static/courseschedule/cs_glossary.htm#crs_srch_exactdays" target="students" onmouseover="displayHelpText('This forces the search to return only those sections which exactly match those days (ie: a Mon,Wed section will NOT match Mon,Wed,Fri).',235,160,event,'Exact match')" onmouseout="closePopup();">
+				    <i class="icon-question-sign"></i></a>&nbsp;&nbsp;
+				    Check here if Available days must match precisely
+				    <input type="CHECKBOX" value="True" name="MUST_MATCH" id="MUST_MATCH">
+				    </label>
+				</div>
+				
+				<div class="control-group">
+				    <label class="" for="CDF">
+				    <a href="http://www.students.ubc.ca/coursesreg/registering-for-courses/credit-d-fail" target="students" onmouseover="displayHelpText('This allows you to search only for courses that are eligible for Credit/D/Fail grading.',235,160,event,'Credit/D/Fail')" onmouseout="closePopup();">
+				    <i class="icon-question-sign"></i></a>&nbsp;&nbsp;
+				    Return courses eligible for <a href="http://www.students.ubc.ca/coursesreg/registering-for-courses/credit-d-fail" target="_blank">Credit/D/Fail</a> only
+				    <input type="CHECKBOX" value="Y" name="CDF" id="CDF">
+				    </label>
+				</div>
+				 
+				<div class="control-group">
+				    <label class="" for="DISTANCE_EDUCATION">
+				    <a href="/static/courseschedule/cs_glossary.htm#crs_srch_det" target="students" onmouseover="displayHelpText('This allows you to search for distance education courses only.',235,160,event,'Distance Education')" onmouseout="closePopup();">
+				    <i class="icon-question-sign"></i></a>&nbsp;&nbsp;
+				    Return Distance Education courses only
+				    <input type="CHECKBOX" value="True" name="DISTANCE_EDUCATION" id="DISTANCE_EDUCATION" onclick="clickDistanceEducation()">
+				    </label>
+				</div>
+				
+			</fieldset>
+			
+		</div>
+		<div class="span3">
+			<fieldset>
+				<legend>Results per Page</legend>
+				<label class="radio">
+				  <input name="scrsz" checked="" type="radio" value="20">
+				  20 Items
+				</label>
+				<label class="radio">
+				  <input name="scrsz" type="radio" value="50">
+				  50 Items
+				</label>
+				<label class="radio">
+				  <input name="scrsz" type="radio" value="100">
+				  100 Items
+				</label>
+			
+			</fieldset>
+  </div>
+</div>
+<div class="control-group">
+    <div class="controls">
+      <input name="submit" type="submit" class="btn btn-primary" value="Search for Sections">
+    </div>
+</div>
+</div>
+
+</form>
