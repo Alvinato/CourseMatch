@@ -41,20 +41,31 @@ echo '<form action="CourseFinder.php">
  }
  
 
-
+// if session variables are set and the button was pressed...
 if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']))
 {
 	Chromephp::log("the session variables has been set");
-	// do the samething here with the session variables... 
+		
+
+		// if the button was pressed reset...
+	if (isset($_GET['CourseSubj']) || isset($_GET['CourseNumb'])) {
+		$_SESSION['CourseSubj'] = $_GET['CourseSubj'];  // reset the session variables...
+		$_SESSION['CourseNumb'] = $_GET['CourseNumb'];
+	}	
+
 	$course = $_SESSION['CourseSubj'];
  	$numb = $_SESSION['CourseNumb'];
- 
+ 	
+ 	Chromephp::log($course);
+ 	Chromephp::log($numb);
+
  	// save this to the session...
  	find_courses_and_display($course, $numb);
-}
-
+}else{
+// only one of these needs to run...
  if (isset($_GET['CourseSubj']) || isset($_GET['CourseNumb'])) {
-
+	
+	Chromephp::log("wow");
  	Chromephp::log($_GET['CourseSubj']);
  	Chromephp::log($_GET['CourseNumb']); 
  	// save the courses to the session and we can just render them again...
@@ -64,11 +75,11 @@ if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']))
 
  	$_SESSION["CourseSubj"] = $course; 
  	$_SESSION["CourseNumb"] = $numb; 
- 	// save this to the session...
+
  	find_courses_and_display($course, $numb);
  	
-
  }
+}
 
 
 
@@ -225,6 +236,8 @@ for($x = 2; $x < count($outputSplit); $x++){
     "Start" => $start, // this will hold the time at which this course is being held...
     "End" => $end
 	);
+
+	Chromephp::log($CourseParts);
 	array_push($Courses, $CourseParts); 
 //	Chromephp::log($Courses);	 
 }
