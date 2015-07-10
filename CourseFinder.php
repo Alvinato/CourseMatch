@@ -212,11 +212,19 @@ for($x = 2; $x < count($outputSplit); $x++){
 
 		//---->>> we need to find the correct time now... check if there is a colon... 
 		if(strpos($outputSplit3[$r],':') !== false){
-			// then we just take the number that is there first.... 
 			if($start == ''){
+
 			$start = substr($outputSplit3[$r],0,5);
+			if (!is_numeric(substr($start, -1)))
+			{	
+				$start = substr($start, 0, -1);
+			}
 		}else{
 			$end = substr($outputSplit3[$r],0,5);
+			if (!is_numeric(substr($end, -1)))
+			{
+				$start = substr($end, 0 , -1);
+			}
 		}
 		}
 	}
@@ -298,19 +306,9 @@ function CourseDisplayer($courses, $coursesubj, $coursenumb){
 // we need to save the session variables
 // one variable that says either it is a delete or it is an add...
 function Course_Cart($Course, $currentsection, $currenttype, $currentday, $currentstart, $currentend, $option){
-
-	/*Chromephp::log($Course);
-	Chromephp::log($currentsection);
-	Chromephp::log($currenttype);
-	Chromephp::log($currentday);
-	Chromephp::log($currentstart);
-	Chromephp::log($currentend);
-	Chromephp::log("blah");*/
 	// now lets show this... 
+	
 	echo "Courses Cart: ";
-
-
-	// we would first want to grab the sessio variable that was already saved and then add onto it... 
 
 	if(isset($_SESSION["cart"])){
 		// if it set then what we do is we add onto the cart
@@ -326,7 +324,6 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 				 'currentend' => $currentend,
 				); 
 
-		
 		if ($option == 'add'){
 		array_push($cart, $course_info_array);
 		}
@@ -345,19 +342,14 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 					){
 						unset($cart[$t]);
 						$cart = array_values($cart);
-						// need to shift everything down once we unset it...
-						// everything that is greater then t we need to shift down one...
-						//for ($y = $t; $y<count($cart); $y++) {
-					//		Chromephp::log("this loop is going");
-				//			$cart[$y] = $cart[$y+1];
-			//			}
+					
 				}
 			}
 
 			}
 
 			
-		Chromephp::log($cart);
+		//Chromephp::log($cart);
 
 		$_SESSION["cart"] = $cart;
 
@@ -366,7 +358,6 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 
 		}else{
 			// if its not set then we save it as a session variable... 
-
 			$cart = [];
 			$course_info_array = array(
 				'course' => $Course,
@@ -390,17 +381,6 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 
 				Course_Cart_Displayer();
 		}
-	
-
-	
-
-	// make a table right now...
-	// we need to add to this table... 
-
-
-
-
-
 }
 
 
@@ -408,7 +388,7 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 function Course_Cart_Displayer(){
 
 	$cart = $_SESSION['cart'];
-	Chromephp::log($cart);
+	//Chromephp::log($cart);
 
 	echo "<table>";
 
@@ -454,6 +434,14 @@ function Course_Cart_Displayer(){
 	}
 
 	echo "</table>";
+
+
+	$string_cart = json_encode($cart);
+
+	echo "<form action= 'Profile.php'>
+			<input type='hidden' name='cart' value ='$string_cart' />
+			<input type='submit' name = 'SaveCourses' value='Save'></button>
+			</form>";
 
 }
 /*
