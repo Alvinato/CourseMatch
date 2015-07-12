@@ -35,17 +35,7 @@ $thePassword;
       $thePassword = $_POST['password'];
   }
 
-
-
 // ----->> the facebook connection stuff
-
-  // lets create the access token... 
-
-  //$helper = new FacebookRedirectLoginHelper('http://localhost/CourseMatch/Facebook.php', '857265011029343', '6895d874134fec6bfe666c55de5d4034');
-
-	
-
-
 
 FacebookSession::setDefaultApplication('857265011029343', '6895d874134fec6bfe666c55de5d4034'); 
 
@@ -116,7 +106,7 @@ if (isset($session)){
         }
         $friendsString = $friendsString.', '.$currentFriend;
       } 
-      save_user_data($fbid, $fbfullname, $femail, $friendsString);
+      save_user_data($fbid, $fbfullname, $femail, $friendsString);  
      
       header('Location: http://localhost/CourseMatch/CourseFinder.php');
 
@@ -133,10 +123,7 @@ if (isset($session)){
 
 function save_user_data($fbid, $fbfullname, $email, $friends){
 
-
-
   Chromephp::log("this function is being called right now");
-
 
   // connect to the db here 
   $db = "CourseMatcher";
@@ -149,8 +136,7 @@ function save_user_data($fbid, $fbfullname, $email, $friends){
   // Check connection
   if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
-  } 
-  
+  }   
 
 // split up the username... 
 $fullnameArray = explode(" ", $fbfullname);
@@ -171,27 +157,33 @@ if ($result->num_rows > 0) {
 } else {
     echo "0 results meaning that this person has not been saved inside the db yet... ";
     // save the user into the db...
-    $sql = "INSERT INTO Users (id, firstname, lastname, email, friends)
-    VALUES ($fbid, '$firstName', '$lastName', '$email', '$friends')";
+    $sql = "INSERT INTO Users (firstname, lastname, email, friends, courses)
+    VALUES ('$firstName', '$lastName', '$email', '$friends', '')";
 
     if ($conn->query($sql) === TRUE) {
-    //echo "New record created successfully";
+    echo "New record created successfully";
     } else {
-    //echo "Error: " . $sql . "<br>" . $conn->error;
+    echo "Error: " . $sql . "<br>" . $conn->error;
     }
 
 }
 
 
+}
 
-/*
-// sql to create table
+
+
+
+
+
+/*//---->> SQL users table set up...
 $sql = "CREATE TABLE Users (
 id INT(20) UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
 firstname VARCHAR(30) NOT NULL,
 lastname VARCHAR(30) NOT NULL,
 email VARCHAR(50),
 friends VARCHAR(100000),
+Courses VARCHAR(100000),
 reg_date TIMESTAMP
 )";
 
@@ -200,18 +192,8 @@ if ($conn->query($sql) === TRUE) {
 } else {
     //echo "Error creating table: " . $conn->error;
 }
+
 */
-
-
-
-
-}
-
-
-
-
-
-
 
 // If you're making app-level requests:
 //$session = FacebookSession::newAppSession();
