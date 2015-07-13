@@ -111,7 +111,7 @@ echo "</div>";
 <ul class="nav nav-tabs">
   <li role="presentation" class="active"><a href="#">Course Browser</a></li>
   <li role="presentation"><a href="Profile.php">Profile</a></li>
-  <li role="presentation"><a href="#">Messages</a></li>
+  <li role="presentation"><a href="StudyGroup.php">Study Groups</a></li>
 
 </ul>
 
