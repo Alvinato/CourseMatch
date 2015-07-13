@@ -1,26 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Course-Match Homepage</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="bootstrap-social/bootstrap-social.less" rel="stylesheet">
+    <link href="bootstrap-social/bootstrap-social.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+  </head> 
+
+  <div>
+    <?php
+            // this is going to take in the info about the courses and its going to save it to the users profile and display it properly... 
+        include 'ChromePhp.php';
+        //define('FACEBOOK_SDK_V4_SRC_DIR', '/path/to/fb-php-sdk-v4/src/Facebook/');
+        require __DIR__ . '/facebook-php-sdk/autoload.php';
+        //require __DIR__ . '/facebook-php-sdk/src/Facebook/FacebookSession.php'
+        //require_once 'autoload.php';
+
+        use Facebook\FacebookSession;
+        use Facebook\FacebookRedirectLoginHelper;
+        use Facebook\FacebookRequest;
+        use Facebook\FacebookResponse;
+        use Facebook\FacebookSDKException;
+        use Facebook\FacebookRequestException;
+        use Facebook\FacebookAuthorizationException;
+        use Facebook\GraphObject;
+        use Facebook\Entities\AccessToken;
+        use Facebook\HttpClients\FacebookCurlHttpClient;
+        use Facebook\HttpClients\FacebookHttpable;
+
+
+        session_start();
+
+
+
+        if (isset($_SESSION['PICTURE'])){
+          FacebookSession::setDefaultApplication('857265011029343', '6895d874134fec6bfe666c55de5d4034'); 
+          $helper = new FacebookRedirectLoginHelper('http://localhost/CourseMatch/Profile.php');
+
+
+          // here we need to create the session... 
+            try {
+            $session = $helper->getSessionFromRedirect();
+          } catch( FacebookRequestException $ex ) {
+            Chromephp::log("FacebookRequestException");
+            Chromephp::log($ex);
+            // When Facebook returns an error
+          } catch( Exception $ex ) {
+            // When validation fails or other local issues
+            Chromephp::log("Exception");
+            Chromephp::log($ex);
+          }
+
+            if (isset($session)){
+                
+              
+                  $request = new FacebookRequest($session, 'GET', '/me');
+
+                  $response = $request ->execute();
+
+                  $graphObject = $response->getGraphObject();
+                  $fbid = $graphObject->getProperty('id');              // To Get Facebook ID
+                  $fbfullname = $graphObject->getProperty('name'); // To Get Facebook full name
+                  $femail = $graphObject->getProperty('email');    // To Get Facebook email ID
+
+                  
+                  $_SESSION['FBID'] = $fbid;           
+                    $_SESSION['FULLNAME'] = $fbfullname;
+                  $_SESSION['EMAIL'] =  $femail;
+
+                  $friends = (new FacebookRequest( $session, 'GET', '/me/friends' ))->execute()->getGraphObject()->asArray();
+                  
+
+                    $friendsString = ''; // use this string to save into the friendslist...
+
+                    $sizeofFriendlist = count($friends['data']);
+
+                    for($x = 0; $x < $sizeofFriendlist; $x++){
+                        $currentFriend = $friends['data'][$x]->name;
+                        if ($friendsString == ''){
+                            $friendsString = $currentFriend;
+                              continue;
+                        }
+                        $friendsString = $friendsString.', '.$currentFriend;
+                      } 
+
+                      $_SESSION['FRIENDS'] = $friendsString;
+                      // now lets get the photo so we can display it... 
+
+
+                      // with all this facebook information we need to save the courses that he is taking here... 
+
+                     // Save_Courses_to_User($fbid, $fbfullname, $femail, $friendsString);
+
+                        $_SESSION['PICTURE']= $profile_pic = "http://graph.facebook.com/".$fbid."/picture";
+                        echo "<div>";               
+                        echo "<img src=\"" . $profile_pic . "\" />"; 
+
+                        echo $fbfullname;
+
+                        echo "</div>";
+
+                }else{
+                   // there is no session and we redirect to the login page... 
+                   //Chromephp::log("there is no session here");
+                    $loginUrl = $helper->getLoginUrl(array("user_friends", "user_status","email","public_profile"));
+                    
+                  header("Location: ".$loginUrl);
+                }
+              }else{
+
+
+              echo "<div>";               
+              echo "<img src=\"" . $_SESSION['PICTURE'] . "\" />"; 
+              echo $_SESSION['FULLNAME'];
+              echo "</div>";
+              }
+              ?>
+  </div>
+
+<ul class="nav nav-tabs">
+  <li role="presentation"><a href="CourseFinder.php">Course Browser</a></li>
+  <li role="presentation" class="active" ><a href="#">Profile</a></li>
+  <li role="presentation"><a href="#">Messages</a></li>
+
+</ul>
+
+
+<body>
+
+
+
 <?php
 
-// this is going to take in the info about the courses and its going to save it to the users profile and display it properly... 
-include 'ChromePhp.php';
-//define('FACEBOOK_SDK_V4_SRC_DIR', '/path/to/fb-php-sdk-v4/src/Facebook/');
-require __DIR__ . '/facebook-php-sdk/autoload.php';
-//require __DIR__ . '/facebook-php-sdk/src/Facebook/FacebookSession.php'
-//require_once 'autoload.php';
-
-use Facebook\FacebookSession;
-use Facebook\FacebookRedirectLoginHelper;
-use Facebook\FacebookRequest;
-use Facebook\FacebookResponse;
-use Facebook\FacebookSDKException;
-use Facebook\FacebookRequestException;
-use Facebook\FacebookAuthorizationException;
-use Facebook\GraphObject;
-use Facebook\Entities\AccessToken;
-use Facebook\HttpClients\FacebookCurlHttpClient;
-use Facebook\HttpClients\FacebookHttpable;
+// what this does... saves the courses from the previous page. gets the user that is currently logged in and then saves it...
 
 
-session_start();
+Save_Courses_to_User($_SESSION['FBID'], $_SESSION['FULLNAME'], $_SESSION['EMAIL'], $_SESSION['FRIENDS']);
+
 
 if(isset($_GET['SaveCourses'])){
 
@@ -30,97 +159,19 @@ if(isset($_GET['SaveCourses'])){
 }
 
 
-  
-FacebookSession::setDefaultApplication('857265011029343', '6895d874134fec6bfe666c55de5d4034'); 
-$helper = new FacebookRedirectLoginHelper('http://localhost/CourseMatch/Profile.php');
-
-
-// here we need to create the session... 
-	try {
-  $session = $helper->getSessionFromRedirect();
-} catch( FacebookRequestException $ex ) {
-  Chromephp::log("FacebookRequestException");
-  Chromephp::log($ex);
-  // When Facebook returns an error
-} catch( Exception $ex ) {
-  // When validation fails or other local issues
-  Chromephp::log("Exception");
-  Chromephp::log($ex);
-}
-
-	if (isset($session)){
-			
-		
-  			$request = new FacebookRequest($session, 'GET', '/me');
-
-  			$response = $request ->execute();
-
-    		$graphObject = $response->getGraphObject();
-     		$fbid = $graphObject->getProperty('id');              // To Get Facebook ID
-     		$fbfullname = $graphObject->getProperty('name'); // To Get Facebook full name
-     		$femail = $graphObject->getProperty('email');    // To Get Facebook email ID
-
-     		
-     		$_SESSION['FBID'] = $fbid;           
-        	$_SESSION['FULLNAME'] = $fbfullname;
-     		$_SESSION['EMAIL'] =  $femail;
-
-     		$friends = (new FacebookRequest( $session, 'GET', '/me/friends' ))->execute()->getGraphObject()->asArray();
-     		
-
-      		$friendsString = ''; // use this string to save into the friendslist...
-
-      		$sizeofFriendlist = count($friends['data']);
-
-      		for($x = 0; $x < $sizeofFriendlist; $x++){
-        			$currentFriend = $friends['data'][$x]->name;
-			        if ($friendsString == ''){
-          				$friendsString = $currentFriend;
-          					continue;
-        			}
-        			$friendsString = $friendsString.', '.$currentFriend;
-      			} 
-
-      			// with all this facebook information we need to save the courses that he is taking here... 
-
-      			Save_Courses_to_User($fbid, $fbfullname, $femail, $friendsString);
-
-			}else{
-				 // there is no session and we redirect to the login page... 
- 				 //Chromephp::log("there is no session here");
-   				$loginUrl = $helper->getLoginUrl(array("user_friends", "user_status","email","public_profile"));
-   				
- 				header("Location: ".$loginUrl);
-			}
-
-
-
-
 
 // save the user data to the user...
 function Save_Courses_to_User($fbid, $fbfullname, $femail, $friendstring){
 
-  //Chromephp::log("This is working");
-
-  //Chromephp::log($_SESSION['SaveCourses']);
-
 	if(isset($_SESSION['SaveCourses'])){
 
     $cart = $_SESSION['SaveCourses'];
-		//Chromephp::log($cart);  // dont need this as an array leave it as a string... 
-    //$cart = json_decode($cart);
-		//Chromephp::log($cart);
-
-    // split the fullname into first and last names... 
+	
     $nameString = explode(' ',$fbfullname);
     $firstname = $nameString[0];
     $lastname = $nameString[1];
 
-    //Chromephp::log($firstname);
-    //Chromephp::log($lastname);
-    // we have to find the row to alter based on this input info...
-
-    // connect to the db here 
+    
     $db = "CourseMatcher";
     $servername = "localhost";
     $username = "root";
@@ -150,20 +201,11 @@ function Save_Courses_to_User($fbid, $fbfullname, $femail, $friendstring){
 	}
 
 
-// this function is going to go through each course and then through each course we try to find each friend that is taking that course!
 function find_friend_matches($friendstring, $courses, $conn){
 
-// lets create the listing of friends that are taking the same courses as this person... 
-
-// go through all the courses first though... 
 $courses_array = json_decode($courses);
 $friends_array = explode(', ' , $friendstring);
-//Chromephp::log($courses_array);
-//Chromephp::log($friends_array);
-//Chromephp::log($friendstring);
-// we go through the list of courses... 
 
-// for each course we look up each friend and their courses...
 for($r = 0; $r < count($courses_array); $r++){
 
   Chromephp::log("inside the first loop right now");
@@ -206,8 +248,11 @@ for($r = 0; $r < count($courses_array); $r++){
   }
 
 }
-
-
-
-
 ?>
+
+</body> 
+
+</html>
+
+
+
