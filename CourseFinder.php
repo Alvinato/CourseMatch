@@ -1,11 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Course-Match Homepage</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="bootstrap-social/bootstrap-social.less" rel="stylesheet">
+    <link href="bootstrap-social/bootstrap-social.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+    </head>
 
 
+<!--  We should make a nav bar here first...-->
+
+<body>
 
 <?php
-
 include 'ChromePhp.php';
-
-
 session_start();  // start the session so we can save stuff...
 
 echo '<form action="CourseFinder.php">
@@ -75,10 +96,6 @@ if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']))
  	
  }
 }
-
-
-
-
 
 // this function is going to find the courses and display them...
 function find_courses_and_display($CourseSubj, $CourseNumb){
@@ -456,3 +473,8 @@ function Course_Cart_Displayer(){
     				</form>*/
 
 ?>
+
+
+</body>
+
+</html>

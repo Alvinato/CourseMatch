@@ -8,66 +8,43 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>Signin Template for Bootstrap</title>
+    <title>Course-Match Homepage</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Custom styles for this template -->
-    
+    <link href="bootstrap-social/bootstrap-social.less" rel="stylesheet">
+    <link href="bootstrap-social/bootstrap-social.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+
   </head>
 
   <body>
-
-    <!--  somehow lets gather this information and send this over to a php file where I am going to retrieve the friendslist and then from that we are going to go to the next page... first realize how to call the next php function first...
-
-    // lets call the ajax function that will send over the php code...
-    -->
-    <div class="container">
-
-      <form class="form-signin" action = "Facebook.php" method="post">
-        <h2 class="form-signin-heading">FaceBook Login</h2>
-       
-        <label for="inputEmail" class="sr-only">Email address</label>
-        <input type="email" name = "email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
-       
-        <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" name = "password" id="inputPassword" class="form-control" placeholder="Password" required="">
-       
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" value="remember-me"> Remember me
-          </label>
-        </div>
-
-        <button class="btn btn-lg btn-primary btn-block" type="submit" >Sign in with Facebook</button>
-      </form>
-
-    </div> <!-- /container -->
-
-</body>
-
     
-</html>
+    <div>
 
-<script>  
+    </div>  
 
-// this function should call the ajax that will take everything and send it over!!...
-function onrequest()
-   {
-     $(document).ready(function(){
-    $('.button').click(function(){
-        var clickBtnValue = $(this).val();
-        var ajaxurl = 'FaceBook.php',
-        data =  {'action': clickBtnValue};
-        $.post(ajaxurl, data, function (response) {
-            // Response div goes here.
-            alert("action performed successfully");
-        });
-    });
 
-});
 
-    }
+      <div class="container">
+       <form class="form-signin" action = "Facebook.php" method="post">
+                
+                   <div class="col-md-12">
+                        <a href="http://localhost/CourseMatch/Facebook.php" title="Facebook" class="btn btn-block btn-social btn-lg btn-facebook">
+                        <i class="fa fa-facebook">
+                        </i> 
+                        Sign in with Facebook
+                        </a>
+                    </div>
+       </form>   
+    </div> <!-- /container -->  
 
-</script>
+
+
+  </body>
+
+  </html>
+
+
