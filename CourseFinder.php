@@ -113,7 +113,7 @@ echo "</div>";
   <li role="presentation" class="active"><a href="#">Course Browser</a></li>
   <li role="presentation"><a href="Profile.php">Profile</a></li>
   <li role="presentation"><a href="StudyGroup.php">Study Groups</a></li>
-
+  <li role="presentation"><a href="WhosFree.php">Who's Free</a></li>
 </ul>
 
 
@@ -123,15 +123,31 @@ echo "</div>";
 
 <?php
 
+/*
+<input list="browsers" name="browser">
+<datalist id="browsers">
+  <option value="Internet Explorer">
+  <option value="Firefox">
+  <option value="Chrome">
+  <option value="Opera">
+  <option value="Safari">
+</datalist>*/
 
-  
 echo '<form action="CourseFinder.php">
-  Term: <input type="text" name="term"><br>
+  Term: <input list="term" name="term">
+  			<datalist id="term">
+  				<option value="Term 1">Term 1</option>
+  				<option value="Term 2">Term 2</option>
+  				<option value="Term 1-2">Term 1 & 2</option>
+				</datalist>
+  				<br>
   Course Subject: <input type="text" name="CourseSubj"><br>
   Course Number: <input type="text" name="CourseNumb"><br>
   <input type="submit" value="Search" >
 </form>';
- 
+	
+
+
 	 if(isset($_GET['delete'])){
 	 	$course = $_GET['course1'];
  		$section = $_GET['section1'];
@@ -143,7 +159,7 @@ echo '<form action="CourseFinder.php">
  	}
 
 	
-Chromephp::log("this is getting called right now");
+
  if(isset($_GET['add'])){
  	Chromephp::log("inside the add function");	
  	$course = $_GET['course'];
@@ -158,44 +174,54 @@ Chromephp::log("this is getting called right now");
  
 
 // if session variables are set and the button was pressed...
-if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']))
+
+if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']) || isset($_SESSION['term']))
 {
 	//Chromephp::log("the session variables has been set");
-	if (isset($_GET['CourseSubj']) || isset($_GET['CourseNumb'])) {
+	if (isset($_GET['CourseSubj']) || isset($_GET['CourseNumb']) || isset($_GET['term'])) {
 		$_SESSION['CourseSubj'] = $_GET['CourseSubj'];  // reset the session variables...
 		$_SESSION['CourseNumb'] = $_GET['CourseNumb'];
-	}	
+		$_SESSION['term'] = $_GET['term'];
+	}		
 
 	$course = $_SESSION['CourseSubj'];
  	$numb = $_SESSION['CourseNumb'];
- 	
+ 	$term = $_SESSION['term'];
  	//Chromephp::log($course);
  	//Chromephp::log($numb);
 
  	// save this to the session...
- 	find_courses_and_display($course, $numb);
+ 	find_courses_and_display($course, $numb, $term);
 }else{
 // only one of these needs to run...
- if (isset($_GET['CourseSubj']) || isset($_GET['CourseNumb'])) {
+
+	// check if the term got set here...
+
+ if (isset($_GET['CourseSubj']) || isset($_GET['CourseNumb']) || isset($_GET['term'])) {
 	
 	//Chromephp::log("wow");
  	//Chromephp::log($_GET['CourseSubj']);
  	//Chromephp::log($_GET['CourseNumb']); 
  	// save the courses to the session and we can just render them again...
-
+ 	$term = $_GET['term'];
  	$course = $_GET['CourseSubj'];
  	$numb = $_GET['CourseNumb'];
 
  	$_SESSION["CourseSubj"] = $course; 
  	$_SESSION["CourseNumb"] = $numb; 
-
- 	find_courses_and_display($course, $numb);
+ 	$_SESSION['term'] = $term;
+ 	find_courses_and_display($course, $numb, $term);
  	
  }
 }
 
 // this function is going to find the courses and display them...
-function find_courses_and_display($CourseSubj, $CourseNumb){
+function find_courses_and_display($CourseSubj, $CourseNumb, $term){
+
+
+// term is not working right now because we might be posting the wrong type...
+Chromephp::log($term);
+
 
 
 $url = 'https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=sectsearch';
@@ -215,7 +241,7 @@ curl_setopt ($ch, CURLOPT_POST, true);
 // this is the data that we need to post... 
 //Chromephp::log($CourseSubj);
 //Chromephp::log($CourseNumb);
-$post_data = "subj=$CourseSubj&crsno=$CourseNumb";
+$post_data = "subj=$CourseSubj&crsno=$CourseNumb&term=$term";
 //$post_data = "subj=CPSC&crsno=304";
 curl_setopt ($ch, CURLOPT_POSTFIELDS, $post_data);
 curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);

@@ -137,7 +137,7 @@
   <li role="presentation"><a href="CourseFinder.php">Course Browser</a></li>
   <li role="presentation" class="active" ><a href="#">Profile</a></li>
   <li role="presentation"><a href="StudyGroup.php">Study Groups</a></li>
-
+  <li role="presentation"><a href="WhosFree.php">Who's Free</a></li>
 </ul>
 
 

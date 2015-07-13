@@ -22,6 +22,9 @@
      <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 	<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 	<script src="underscore/underscore.js"></script>
+  
+<script src="HourSelector/src/index.js"></script>
+
     </head>
 	<div>
 		 <?php
@@ -113,44 +116,40 @@ echo "</div>";
 <ul class="nav nav-tabs">
   <li role="presentation"><a href="CourseFinder.php">Course Browser</a></li>
   <li role="presentation"><a href="Profile.php">Profile</a></li>
-  <li role="presentation" class = "active"><a href="#">Study Groups</a></li>
-  <li role="presentation"><a href="WhosFree.php">Who's Free</a></li>
+  <li role="presentation"><a href="StudyGroup.php">Study Groups</a></li>
+   <li role="presentation" class = "active"><a href="#">Who's Free</a></li>
+
 </ul>
 
  
 
 
 <body>
+<div id="weekly-schedule">
 
-<!-- create the calendar here!!-->
-<div id="calendar"></div>
+<script>
+    // create the weekly schedule animation...
+    $("#weekly-schedule").dayScheduleSelector({
 
-    
-    <script type="text/javascript" src="bootstrap-calendar/js/calendar.js"></script>
-    
-    <!-- we need a container here to make this calendar here smaller. --> 
 
-    <script type="text/javascript">
-        var calendar = $("#calendar").calendar(
-            {
-                tmpl_path: "bootstrap-calendar/tmpls/",
-                events_source: function () { return []; }
-            });         
-    </script>
+    });
 
 
 
+</script>
 
+</div>
 
-<?php
-
-// first show the calendar on the top left there...
+<?php 
+      // what info is this going to need? 
+      // we need to go through everyone on the persons friendslist
 
 
 
 
 ?>
 
+
 </body> 
 
-</html>
+</html>  
