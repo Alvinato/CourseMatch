@@ -18,8 +18,10 @@
     <link href="bootstrap-social/bootstrap-social.css" rel="stylesheet">
     <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
-
-
+     <link href="bootstrap-calendar/css/calendar.css" rel="stylesheet">
+     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+	<script src="underscore/underscore.js"></script>
     </head>
 	<div>
 		 <?php
@@ -115,10 +117,25 @@ echo "</div>";
 
 </ul>
 
-
+ 
 
 
 <body>
+
+<!-- create the calendar here!!-->
+<div id="calendar"></div>
+
+    
+    <script type="text/javascript" src="bootstrap-calendar/js/calendar.js"></script>
+    <script type="text/javascript">
+        var calendar = $("#calendar").calendar(
+            {
+                tmpl_path: "bootstrap-calendar/tmpls/",
+                events_source: function () { return []; }
+            });         
+    </script>
+
+
 
 
 
