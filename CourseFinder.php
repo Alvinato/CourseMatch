@@ -21,83 +21,91 @@
 
 
     </head>
-
-
-<!--  We should make a nav bar here first...-->
-	
 	<div>
-		  <?
-        	include 'ChromePhp.php';
+		 <?php
+		 include 'ChromePhp.php';
 
-			require __DIR__ . '/facebook-php-sdk/autoload.php';
-			use Facebook\FacebookSession;
-			use Facebook\FacebookRedirectLoginHelper;
-			use Facebook\FacebookRequest;
-			use Facebook\FacebookResponse;
-			use Facebook\FacebookSDKException;
-			use Facebook\FacebookRequestException;
-			use Facebook\FacebookAuthorizationException;
-			use Facebook\GraphObject;
-			use Facebook\Entities\AccessToken;
-			use Facebook\HttpClients\FacebookCurlHttpClient;
-			use Facebook\HttpClients\FacebookHttpable;
+            require __DIR__ . '/facebook-php-sdk/autoload.php';
+            use Facebook\FacebookSession;
+            use Facebook\FacebookRedirectLoginHelper;
+            use Facebook\FacebookRequest;
+            use Facebook\FacebookResponse;
+            use Facebook\FacebookSDKException; 
+            use Facebook\FacebookRequestException;
+            use Facebook\FacebookAuthorizationException;
+            use Facebook\GraphObject;
+            use Facebook\Entities\AccessToken;
+            use Facebook\HttpClients\FacebookCurlHttpClient;
+            use Facebook\HttpClients\FacebookHttpable;
 
-        	session_start();  // start the session so we can save stuff...
-        	// start here by checking the facebook login information...
-        	FacebookSession::setDefaultApplication('857265011029343', '6895d874134fec6bfe666c55de5d4034'); 
-        	$helper = new FacebookRedirectLoginHelper('http://localhost/CourseMatch/CourseFinder.php');
-        	// use this facebook login and just display the users name and hopefully profile picture...
+            session_start();  // start the session so we can save stuff...
+            // start here by checking the facebook login information...
 
-				// here we need to create the session... 
-					try {
-				  $session = $helper->getSessionFromRedirect();
-				} catch( FacebookRequestException $ex ) {
-				  Chromephp::log("FacebookRequestException");
-				  Chromephp::log($ex);
-				  // When Facebook returns an error
-				} catch( Exception $ex ) {
-				  // When validation fails or other local issues
-				  Chromephp::log("Exception");
-				  Chromephp::log($ex);
-			}
 
-			if (isset($session)){
-				// graph api request for user data...
-				  $request = new FacebookRequest($session, 'GET', '/me');
+// if we have the session then we dont have to go through this again... 
+            if (!isset($_SESSION['PICTURE'])){
 
-				  $response = $request ->execute();
+            FacebookSession::setDefaultApplication('857265011029343', '6895d874134fec6bfe666c55de5d4034'); 
+            $helper = new FacebookRedirectLoginHelper('http://localhost/CourseMatch/CourseFinder.php');
+            // use this facebook login and just display the users name and hopefully profile picture...
 
-				  // get the response... 
+                // here we need to create the session... 
+                    try {
+                  $session = $helper->getSessionFromRedirect();
+                } catch( FacebookRequestException $ex ) {
+                  Chromephp::log("FacebookRequestException");
+                  Chromephp::log($ex);
+                  // When Facebook returns an error
+                } catch( Exception $ex ) {
+                  // When validation fails or other local issues
+                  Chromephp::log("Exception");
+                  Chromephp::log($ex);
+            }
 
-				   $graphObject = $response->getGraphObject();
-				   $fbid = $graphObject->getProperty('id');              // To Get Facebook ID
-				   $fbfullname = $graphObject->getProperty('name'); // To Get Facebook full name
-				   $femail = $graphObject->getProperty('email');    // To Get Facebook email ID
+            if (isset($session)){
+                // graph api request for user data...
+                  $request = new FacebookRequest($session, 'GET', '/me');
 
-				     /* ---- Session Variables -----*/
-				     $_SESSION['FBID'] = $fbid;           
-				        $_SESSION['FULLNAME'] = $fbfullname;
-				     $_SESSION['EMAIL'] =  $femail;
+                  $response = $request ->execute();
 
-				    
-				    //create the url... 
-				     $profile_pic = "http://graph.facebook.com/".$fbid."/picture";
-				   		echo "<div>";				
-						echo "<img src=\"" . $profile_pic . "\" />"; 
+                  // get the response... 
 
-				     	echo $fbfullname;
+                   $graphObject = $response->getGraphObject();
+                   $fbid = $graphObject->getProperty('id');              // To Get Facebook ID
+                   $fbfullname = $graphObject->getProperty('name'); // To Get Facebook full name
+                   $femail = $graphObject->getProperty('email');    // To Get Facebook email ID
 
-				     	echo "</div>";
+                     /* ---- Session Variables -----*/
+                     $_SESSION['FBID'] = $fbid;           
+                        $_SESSION['FULLNAME'] = $fbfullname;
+                     $_SESSION['EMAIL'] =  $femail;
 
-			}else{
-				// there is no session and we redirect to the login page... 
-				  Chromephp::log("there is no session here");
-				   $loginUrl = $helper->getLoginUrl(array("user_friends", "user_status","email","public_profile", "user_photos"));
-				   Chromephp::log($loginUrl);
-				 header("Location: ".$loginUrl);
-			}
+                    
+                    //create the url... 
+				$_SESSION['PICTURE']= $profile_pic = "http://graph.facebook.com/".$fbid."/picture";
+                        echo "<div>";               
+                        echo "<img src=\"" . $profile_pic . "\" />"; 
 
-        ?>
+                        echo $fbfullname;
+
+                        echo "</div>";
+
+            }else{
+                // there is no session and we redirect to the login page... 
+                  Chromephp::log("there is no session here");
+                   $loginUrl = $helper->getLoginUrl(array("user_friends", "user_status","email","public_profile", "user_photos"));
+                   Chromephp::log($loginUrl);
+                 header("Location: ".$loginUrl);
+            }
+}else{
+
+echo "<div>";               
+echo "<img src=\"" . $_SESSION['PICTURE'] . "\" />"; 
+echo $_SESSION['FULLNAME'];
+echo "</div>";
+}
+
+		 ?>
 	</div>
 
 <ul class="nav nav-tabs">
@@ -115,8 +123,7 @@
 <?php
 
 
-
-
+  
 echo '<form action="CourseFinder.php">
   Term: <input type="text" name="term"><br>
   Course Subject: <input type="text" name="CourseSubj"><br>
@@ -135,8 +142,9 @@ echo '<form action="CourseFinder.php">
  	}
 
 	
-
+Chromephp::log("this is getting called right now");
  if(isset($_GET['add'])){
+ 	Chromephp::log("inside the add function");	
  	$course = $_GET['course'];
  	$section = $_GET['section'];
  	$type = $_GET['type'];
