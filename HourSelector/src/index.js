@@ -1,7 +1,12 @@
 (function ($) {
   'use strict';
 
+
+
+  // we just need an onclick handler for choosing the days that are going to be highlighted.
+  // then when he is finished choosing we assemble a list of people that are going to be free within that time.
   var DayScheduleSelector = function (el, options) {
+   
     this.$el = $(el);
     this.options = $.extend({}, DayScheduleSelector.DEFAULTS, options);
     this.render();
@@ -100,9 +105,21 @@
       , $slots;
 
     this.$el.on('click', '.time-slot', function () {
+
+      // this should be triggered when the slots are clicked... 
+      console.log("the square just got clicked");
       var day = $(this).data('day');
       if (!plugin.isSelecting()) {  // if we are not in selecting mode
-        if (isSlotSelected($(this))) { plugin.deselect($(this)); }
+
+        console.log("the intial selection");
+
+        if (isSlotSelected($(this))) { 
+          console.log("deleting the redness from the circle");
+          plugin.deselect($(this)); 
+        
+        }
+
+
         else {  // then start selecting
           plugin.$selectingStart = $(this);
           $(this).attr('data-selecting', 'selecting');
@@ -120,10 +137,17 @@
         }
       }
     });
+  
 
+  // this here is getting called everytime you place the mouse over the squares here..
     this.$el.on('mouseover', '.time-slot', function () {
+      console.log("the mouse over");
       var $slots, day, start, end, temp;
+
+
       if (plugin.isSelecting()) {  // if we are in selecting mode
+
+        console.log("we are in selecting mode");
         day = plugin.$selectingStart.data('day');
         $slots = plugin.$el.find('.time-slot[data-day="' + day + '"]');
         $slots.filter('[data-selecting]').removeAttr('data-selecting');
