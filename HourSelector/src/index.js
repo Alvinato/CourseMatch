@@ -107,11 +107,11 @@
     this.$el.on('click', '.time-slot', function () {
 
       // this should be triggered when the slots are clicked... 
-      console.log("the square just got clicked");
+    //  console.log("the square just got clicked");
       var day = $(this).data('day');
       if (!plugin.isSelecting()) {  // if we are not in selecting mode
 
-        console.log("the intial selection");
+        //console.log("the intial selection");
 
         if (isSlotSelected($(this))) { 
           console.log("deleting the redness from the circle");
@@ -121,6 +121,7 @@
 
 
         else {  // then start selecting
+
           plugin.$selectingStart = $(this);
           $(this).attr('data-selecting', 'selecting');
           plugin.$el.find('.time-slot').attr('data-disabled', 'disabled');
@@ -129,8 +130,21 @@
       } else {  // if we are in selecting mode
         if (day == plugin.$selectingStart.data('day')) {  // if clicking on the same day column
           // then end of selection
+
+          //console.log(plugin);
+         // console.log(plugin.$el);
+         // console.log(plugin.$el.find('.time-slot[data-day="' + day + '"]'));
+          // lets try to get the outer html from here...
+          // console.log(plugin.$el.find('.time-slot[data-day="' + day + '"]').filter('[data-selecting]'));
+           var list = plugin.$el.find('.time-slot[data-day="' + day + '"]').filter('[data-selecting]');
+          getting_selected_list(list);
+
+
+         // console.log("end the selection");
           plugin.$el.find('.time-slot[data-day="' + day + '"]').filter('[data-selecting]')
-            .attr('data-selected', 'selected').removeAttr('data-selecting');
+          .attr('data-selected', 'selected').removeAttr('data-selecting');
+
+          // we need to grab the outer html and then from there we know which times are being selected atm
           plugin.$el.find('.time-slot').removeAttr('data-disabled');
           plugin.$el.trigger('selected.artsy.dayScheduleSelector', [getSelection(plugin, plugin.$selectingStart, $(this))]);
           plugin.$selectingStart = null;
@@ -141,13 +155,13 @@
 
   // this here is getting called everytime you place the mouse over the squares here..
     this.$el.on('mouseover', '.time-slot', function () {
-      console.log("the mouse over");
+      //console.log("the mouse over");
       var $slots, day, start, end, temp;
 
 
       if (plugin.isSelecting()) {  // if we are in selecting mode
 
-        console.log("we are in selecting mode");
+       // console.log("we are in selecting mode");
         day = plugin.$selectingStart.data('day');
         $slots = plugin.$el.find('.time-slot[data-day="' + day + '"]');
         $slots.filter('[data-selecting]').removeAttr('data-selecting');
@@ -159,6 +173,30 @@
       }
     });
   };
+
+// lets send the function to a php function.
+function getting_selected_list(list){
+  var day_array = [];
+
+  for(var x = 0; x < list.length; x++){
+    day_array.push(list[x].getAttribute('data-time'));
+    day_array.push(list[x].getAttribute('data-day'));
+  }
+
+  var object =  jQuery.ajax({
+                    type: "POST",
+                    url:  "WhosFree.php",   
+                    dataType: 'json',
+                    data: {functionname: 'whosfree', arguments: day_array},  // try to pass the array in...
+
+                    success: function (obj,textstatus) {
+                        console.log("we have successfully returned the ajax call!!");  
+
+                    }
+                });
+
+}
+
 
   /**
    * Serialize the selections

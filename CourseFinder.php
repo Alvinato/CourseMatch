@@ -585,7 +585,7 @@ function Course_Cart_Displayer(){
 
 }
 /*
-<form action= 'CourseFinder.php'>
+					<form action= 'CourseFinder.php'>
     				<input type='hidden' name='course' value =$Course />
     				<input type='hidden' name='section' value =$currentsection />
     				<input type='hidden' name='type' value =$currenttype />
