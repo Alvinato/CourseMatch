@@ -6,7 +6,10 @@
   // we just need an onclick handler for choosing the days that are going to be highlighted.
   // then when he is finished choosing we assemble a list of people that are going to be free within that time.
   var DayScheduleSelector = function (el, options) {
-   
+      
+     //console.log(el);
+    // console.log(options); 
+
     this.$el = $(el);
     this.options = $.extend({}, DayScheduleSelector.DEFAULTS, options);
     this.render();
@@ -115,6 +118,14 @@
 
         if (isSlotSelected($(this))) { 
           console.log("deleting the redness from the circle");
+          console.log($(this)['context']);
+          // this is going to delete a square... so we need to check this square/
+          console.log($(this)['context'].getAttribute('data-time'));
+          console.log($(this)['context'].getAttribute('data-day'));
+          var day = $(this)['context'].getAttribute('data-day');
+          var time = $(this)['context'].getAttribute('data-time');
+
+          delete_time_slot(day, time);
           plugin.deselect($(this)); 
         
         }
@@ -137,6 +148,7 @@
           // lets try to get the outer html from here...
           // console.log(plugin.$el.find('.time-slot[data-day="' + day + '"]').filter('[data-selecting]'));
            var list = plugin.$el.find('.time-slot[data-day="' + day + '"]').filter('[data-selecting]');
+           console.log(list);
           getting_selected_list(list);
 
 
@@ -174,28 +186,108 @@
     });
   };
 
+function delete_time_slot(day, time){
+
+  // we would need to go through that entire day again and see who is available from that. 
+
+  
+
+
+
+  console.log("inside the delete timeslot function right now");
+}
+
+
+
 // lets send the function to a php function.
 function getting_selected_list(list){
+  
   var day_array = [];
 
   for(var x = 0; x < list.length; x++){
+    console.log(list[x]);
     day_array.push(list[x].getAttribute('data-time'));
     day_array.push(list[x].getAttribute('data-day'));
   }
 
-  var object =  jQuery.ajax({
-                    type: "POST",
-                    url:  "WhosFree.php",   
-                    dataType: 'json',
-                    data: {functionname: 'whosfree', arguments: day_array},  // try to pass the array in...
+  //console.log("making the ajax call and awaiting the return!!...");
+var object =  $.ajax({
+                type: "POST",
+                url: "WhosFree.php",   // maybe have to make another url here...
+                
+                data: {functionname: 'whosfree', arguments: day_array},  // try to pass the array in...
 
-                    success: function (obj,textstatus) {
-                        console.log("we have successfully returned the ajax call!!");  
+                success: function (obj, textstatus) {
+                
+                  var listData = html_to_list(obj);
 
-                    }
-                });
+                 // console.log(document.getElementById('freepeople'));
+
+                  // this checks if we have already created a table or not.
+                  if(document.getElementById('freepeople') == null) {
+                  var listContainer = document.createElement("div");
+                  listContainer.id = "freepeople";
+                  }else{
+                    var listContainer = document.getElementById('freepeople');
+                  }
+                  document.getElementsByTagName("body")[0].appendChild(listContainer); 
+                   
+                   // ---> this is the unordered list tag
+                      
+                  var listElement = document.createElement("ul"); 
+
+                  listContainer.appendChild(listElement);
+                    var numberOfListItems = listData.length;
+                  // now we set up the loop that goes through every single item here... 
+
+                     for( var i =  0 ; i < numberOfListItems ; ++i){
+                
+                                        // create a <li> for each one.
+                                        var listItem = document.createElement("li");
+
+                                        // add the item text
+                                        listItem.innerHTML = listData[i];
+                                        listItem.id = listData[i];
+                                        // add listItem to the listElement
+                                        listElement.appendChild(listItem);
+                                }
+                  }
+            
+            });
 
 }
+
+
+// this functino is going to extradct the lsit from the html... 
+function html_to_list(html){
+
+  var string = html.split('{"result":'); // this needs to be split further
+     string = string[1];
+     string = string.split('}\n</div>');
+     string = string[0] 
+     //console.log(string);
+
+  var json_obj = jQuery.parseJSON(string);
+
+  var return_array = [];
+
+ if(document.getElementById('freepeople') == null) {
+
+  return json_obj;
+                }else{
+                  for (var i = 0; i < json_obj.length; i++){
+
+                    if(document.getElementById(json_obj[i]) == null){
+                      // then we return this element because it is not already in the list.
+                      return_array.push(json_obj[i]);
+                    }
+                  }
+                  return return_array;
+          }
+}
+
+
+
 
 
   /**

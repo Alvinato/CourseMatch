@@ -134,6 +134,8 @@ echo "</div>";
     // when someone finds a timeframe we need to grab the time frame and go through each frinds courses and see if it overlaps.
     // we need a hash of every friend and his course listing.
 
+    // basically gives it the div tag that it is going to alter.
+
     $("#weekly-schedule").dayScheduleSelector({
     });
 
@@ -143,26 +145,20 @@ echo "</div>";
 
 </div>
 
+<div>
 <?php 
 
-// this is going to give back the friends that we are going to show in javscript
 $aResult = array();
-
-
-Chromephp::log("inside whosfreehelper");
 
 if(isset($_POST['functionname'])){
   
   if($_POST['functionname']='whosfree'){
     $aResult['result'] = whosfree($_POST['arguments']);
-    Chromephp::log($aResult['result']);
+   //Chromephp::log($aResult['result']);
+   echo json_encode($aResult);
   }
 
-}
-
-
-echo json_encode($aResult); // this i think is going to send the data back through to the javascript side?
-
+} 
 
 function whosfree($arguments){
 
@@ -178,7 +174,7 @@ function whosfree($arguments){
       die("Connection failed: " . $conn->connect_error);
     } 
 
-    Chromephp::log($_SESSION['FULLNAME']); 
+    //Chromephp::log($_SESSION['FULLNAME']); 
 
     $name_array = explode(' ', $_SESSION['FULLNAME']); 
     $firstname = $name_array[0];
@@ -307,16 +303,35 @@ function whosfree($arguments){
 }
 
   
-  Chromephp::log($conflicting_friends);
-  //$conflicting = json_encode($conflicting_friends);
-  return 503;
+  //Chromephp::log($conflicting_friends);
+  // we have to add everyone that is free so everyone that is not in this list here... 
+
+  $returning_friends = $friends;  // this is going to be the list of friends that we are returning.
+
+  for($e = 0; $e < count($friends); $e++){
+    
+    // we go through the conflicting friendslist...
+    for ($p = 0; $p < count($conflicting_friends); $p++){
+      //Chromephp::log("inside the second loop");
+      
+
+      if($friends[$e] == $conflicting_friends[$p]){
+        // Chromephp::log('inside the if statement'); 
+        unset($returning_friends[$e]); // the question is do we unset the original instance of friends..
+       // Chromephp::log($friends);
+      //  Chromephp::log($returning_friends);
+        // then we take that out of returning friends.
+      }
+    }
+  }
+
+  return $returning_friends;
 
 }
 
-
-
 ?>
 
+</div>
 
 </body> 
 

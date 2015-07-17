@@ -98,6 +98,7 @@ if(isset($_POST['functionname'])){
 echo json_encode($aResult); // this i think is going to send the data back through to the javascript side?
 
 
+
 function whosfree($arguments){
 
 	$db = "CourseMatcher";
@@ -241,12 +242,30 @@ function whosfree($arguments){
 }
 
 	
-	Chromephp::log($conflicting_friends);
-	//$conflicting = json_encode($conflicting_friends);
-	return $conflicting_friends;
+  //Chromephp::log($conflicting_friends);
+  // we have to add everyone that is free so everyone that is not in this list here... 
 
-	// i guess we dont need to return anything here as we can display the table in our own way with our own scripts on 
-	// this page...
+  $returning_friends = $friends;  // this is going to be the list of friends that we are returning.
+
+  for($e = 0; $e < count($friends); $e++){
+    
+    // we go through the conflicting friendslist...
+    for ($p = 0; $p < count($conflicting_friends); $p++){
+      //Chromephp::log("inside the second loop");
+      
+
+      if($friends[$e] == $conflicting_friends[$p]){
+        // Chromephp::log('inside the if statement'); 
+        unset($returning_friends[$e]); // the question is do we unset the original instance of friends..
+       // Chromephp::log($friends);
+      //  Chromephp::log($returning_friends);
+        // then we take that out of returning friends.
+      }
+    }
+  }
+
+  return $returning_friends;
+	
 
 }
 

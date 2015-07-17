@@ -36,6 +36,14 @@ body {
 
 }
 
+.weekly-schedule {
+  width: 100px;
+  height: 100px;
+  border: 1px solid red;
+  margin-right:10px;
+  float:left;
+}
+
 .schedule-rows td[data-selected],
 
 .schedule-rows td[data-selecting] { background-color: #E74C3C; }
