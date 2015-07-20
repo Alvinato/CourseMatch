@@ -134,8 +134,6 @@ echo "</div>";
     // when someone finds a timeframe we need to grab the time frame and go through each frinds courses and see if it overlaps.
     // we need a hash of every friend and his course listing.
 
-    // basically gives it the div tag that it is going to alter.
-
     $("#weekly-schedule").dayScheduleSelector({
     });
 
@@ -148,17 +146,25 @@ echo "</div>";
 <div>
 <?php 
 
+// this is going to give back the friends that we are going to show in javscript
 $aResult = array();
 
 if(isset($_POST['functionname'])){
   
   if($_POST['functionname']='whosfree'){
-    $aResult['result'] = whosfree($_POST['arguments']);
-   //Chromephp::log($aResult['result']);
-   echo json_encode($aResult);
+    $aResult = whosfree($_POST['arguments']);
+    Chromephp::log($aResult['result']);
+
+    //this function is going to display the list of people who are free...
+    display_people_free($aResult);
+
   }
 
-} 
+}
+
+//echo json_encode($aResult); // this i think is going to send the data back through to the javascript side?
+//Chromephp::log(json_encode($aResult));
+  
 
 function whosfree($arguments){
 
@@ -301,6 +307,8 @@ function whosfree($arguments){
   }
   }
 }
+
+  
   //Chromephp::log($conflicting_friends);
   // we have to add everyone that is free so everyone that is not in this list here... 
 
@@ -327,10 +335,128 @@ function whosfree($arguments){
 
 }
 
+
+
+
+// this function creates a list on the right hand side of the people who are free at those times!!
+function display_people_free($free_friends){
+
+  Chromephp::log($free_friends);
+
+  echo '<script type="text/javascript">'
+   , 'jsfunction();'
+   , '</script>';
+}
+
+
 ?>
 
-</div>
 
+<script type="text/javascript">
+  jsFunction();
+
+  // place a div inside weekly schedule and hopefully the list will show up...
+  function jsFunction(){
+
+    console.log("this function is being called");
+
+    // here we should make the list.
+    var test = document.getElementById("weekly-schedule");
+
+    console.log(test);
+
+    var myDiv = document.createElement("div");
+    // need this line here after we create the listing.
+    myDiv.appendChild(document.createTextNode('The man who mistook his wife for a hat'));
+    document.getElementById('weekly-schedule').appendChild(myDiv);
+
+    // lets try and creat the div under this.
+
+    // now that we have a div lets create a div inside it
+  }
+
+</script>
+
+
+</div>
 </body> 
 
 </html>  
+
+
+
+
+
+// this should just call one function that reads all the selected time slots and find the matches...
+function delete_time_slot(day, time){
+
+  // we would need to go through that entire day again and see who is available from that. 
+  console.log(day); 
+  console.log(time);
+  
+
+
+
+
+  console.log("inside the delete timeslot function right now");
+}
+
+
+
+// lets send the function to a php function.
+function getting_selected_list(list){
+  
+  var day_array = [];
+
+  for(var x = 0; x < list.length; x++){
+    console.log(list[x]);
+    day_array.push(list[x].getAttribute('data-time'));
+    day_array.push(list[x].getAttribute('data-day'));
+  }
+
+  //console.log("making the ajax call and awaiting the return!!...");
+var object =  $.ajax({
+                type: "POST",
+                url: "WhosFree.php",   // maybe have to make another url here...
+                
+                data: {functionname: 'whosfree', arguments: day_array},  // try to pass the array in...
+
+                success: function (obj, textstatus) {
+                
+                  var listData = html_to_list(obj);
+
+                 // console.log(document.getElementById('freepeople'));
+
+                  // this checks if we have already created a table or not.
+                  if(document.getElementById('freepeople') == null) {
+                  var listContainer = document.createElement("div");
+                  listContainer.id = "freepeople";
+                  }else{
+                    var listContainer = document.getElementById('freepeople');
+                  }
+                  document.getElementsByTagName("body")[0].appendChild(listContainer); 
+                   
+                   // ---> this is the unordered list tag
+                      
+                  var listElement = document.createElement("ul"); 
+
+                  listContainer.appendChild(listElement);
+                    var numberOfListItems = listData.length;
+                  // now we set up the loop that goes through every single item here... 
+
+                     for( var i =  0 ; i < numberOfListItems ; ++i){
+                
+                                        // create a <li> for each one.
+                                        var listItem = document.createElement("li");
+
+                                        // add the item text
+                                        listItem.innerHTML = listData[i];
+                                        listItem.id = listData[i];
+                                        // add listItem to the listElement
+                                        listElement.appendChild(listItem);
+                                }
+                  }
+            
+            });
+
+}

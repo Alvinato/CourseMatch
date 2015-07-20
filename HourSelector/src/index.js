@@ -117,16 +117,32 @@
         //console.log("the intial selection");
 
         if (isSlotSelected($(this))) { 
-          console.log("deleting the redness from the circle");
-          console.log($(this)['context']);
+          //console.log("deleting the redness from the circle");
+          //console.log($(this)['context']);
           // this is going to delete a square... so we need to check this square/
-          console.log($(this)['context'].getAttribute('data-time'));
-          console.log($(this)['context'].getAttribute('data-day'));
+          //console.log($(this)['context'].getAttribute('data-time'));
+          //console.log($(this)['context'].getAttribute('data-day'));
           var day = $(this)['context'].getAttribute('data-day');
           var time = $(this)['context'].getAttribute('data-time');
 
-          delete_time_slot(day, time);
+
+          // try and get all the selected boxes here... 
+          // ---->  
+         // console.log(plugin.$el);
+         // console.log(plugin.$el.context); // we have to go through this and find everything that has been selected... 
+
+          //console.log(document.getElementsByClassName("schedule-rows")[0]);
+         // console.log(document.getElementsByClassName("schedule-rows")[0].rows[0]);
+
+          // lets just loop through this and check the times...
+
+
+          // this gets called when something gets changed in the graph
+          
+
+          //delete_time_slot(day, time);
           plugin.deselect($(this)); 
+          update_list();
         
         }
 
@@ -137,6 +153,7 @@
           $(this).attr('data-selecting', 'selecting');
           plugin.$el.find('.time-slot').attr('data-disabled', 'disabled');
           plugin.$el.find('.time-slot[data-day="' + day + '"]').removeAttr('data-disabled');
+          
         }
       } else {  // if we are in selecting mode
         if (day == plugin.$selectingStart.data('day')) {  // if clicking on the same day column
@@ -148,9 +165,8 @@
           // lets try to get the outer html from here...
           // console.log(plugin.$el.find('.time-slot[data-day="' + day + '"]').filter('[data-selecting]'));
            var list = plugin.$el.find('.time-slot[data-day="' + day + '"]').filter('[data-selecting]');
-           console.log(list);
-          getting_selected_list(list);
-
+          // console.log(list);
+          //getting_selected_list(list);
 
          // console.log("end the selection");
           plugin.$el.find('.time-slot[data-day="' + day + '"]').filter('[data-selecting]')
@@ -160,6 +176,8 @@
           plugin.$el.find('.time-slot').removeAttr('data-disabled');
           plugin.$el.trigger('selected.artsy.dayScheduleSelector', [getSelection(plugin, plugin.$selectingStart, $(this))]);
           plugin.$selectingStart = null;
+          //--->> own function
+          update_list();
         }
       }
     });
@@ -186,62 +204,66 @@
     });
   };
 
-function delete_time_slot(day, time){
 
-  // we would need to go through that entire day again and see who is available from that. 
 
+// this function is going to update the entire list everytime something is pressed...  
+function update_list(){
+
+// as soon as this gets called we need to clear the table.
+var listContainer;
+if(document.getElementById('freepeople') == null) {
+     listContainer = document.createElement("div");
+      listContainer.id = "freepeople";
+      }else{
+                   listContainer = document.getElementById('freepeople');
+                    listContainer.innerHTML = "";
+                  }
+
+
+  var table = document.getElementsByClassName("schedule-rows")[0];
   
+  var array_times_selected = [];
 
-
-
-  console.log("inside the delete timeslot function right now");
-}
-
-
-
-// lets send the function to a php function.
-function getting_selected_list(list){
+  for (var i = 0, row; row = table.rows[i]; i++) {
+    for (var j = 0, col; col = row.cells[j]; j++) {
+        if(col.getAttribute('data-selected') == 'selected'){
+          array_times_selected.push(col);  
+        }
+   }  
+  }
   
-  var day_array = [];
+  var sending_through_array = [];
 
-  for(var x = 0; x < list.length; x++){
-    console.log(list[x]);
-    day_array.push(list[x].getAttribute('data-time'));
-    day_array.push(list[x].getAttribute('data-day'));
+  // with these times we need to send them through over ajax...
+  for(var x = 0; x < array_times_selected.length; x++){
+    sending_through_array.push(array_times_selected[x].getAttribute('data-time'));
+    sending_through_array.push(array_times_selected[x].getAttribute('data-day'));
   }
 
-  //console.log("making the ajax call and awaiting the return!!...");
-var object =  $.ajax({
+  console.log(sending_through_array);
+  // we check that if the list is empty then we need to just completely delete this list.
+  var object =  $.ajax({
                 type: "POST",
                 url: "WhosFree.php",   // maybe have to make another url here...
                 
-                data: {functionname: 'whosfree', arguments: day_array},  // try to pass the array in...
+                data: {functionname: 'whosfree', arguments: sending_through_array},  
 
                 success: function (obj, textstatus) {
                 
                   var listData = html_to_list(obj);
+                  console.log(listData);
 
-                 // console.log(document.getElementById('freepeople'));
-
-                  // this checks if we have already created a table or not.
-                  if(document.getElementById('freepeople') == null) {
-                  var listContainer = document.createElement("div");
-                  listContainer.id = "freepeople";
-                  }else{
-                    var listContainer = document.getElementById('freepeople');
-                  }
+                 
+                    //listContainer = document.getElementById('freepeople');
+                    console.log(listContainer);
                   document.getElementsByTagName("body")[0].appendChild(listContainer); 
                    
-                   // ---> this is the unordered list tag
-                      
                   var listElement = document.createElement("ul"); 
 
                   listContainer.appendChild(listElement);
                     var numberOfListItems = listData.length;
-                  // now we set up the loop that goes through every single item here... 
 
                      for( var i =  0 ; i < numberOfListItems ; ++i){
-                
                                         // create a <li> for each one.
                                         var listItem = document.createElement("li");
 
@@ -252,20 +274,16 @@ var object =  $.ajax({
                                         listElement.appendChild(listItem);
                                 }
                   }
-            
             });
-
 }
 
 
-// this functino is going to extradct the lsit from the html... 
 function html_to_list(html){
 
-  var string = html.split('{"result":'); // this needs to be split further
+  var string = html.split('{"result":'); 
      string = string[1];
      string = string.split('}\n</div>');
      string = string[0] 
-     //console.log(string);
 
   var json_obj = jQuery.parseJSON(string);
 
@@ -278,7 +296,6 @@ function html_to_list(html){
                   for (var i = 0; i < json_obj.length; i++){
 
                     if(document.getElementById(json_obj[i]) == null){
-                      // then we return this element because it is not already in the list.
                       return_array.push(json_obj[i]);
                     }
                   }
