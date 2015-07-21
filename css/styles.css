@@ -44,6 +44,19 @@ body {
   float:left;
 }
 
+.schedule-table {
+  float:left;
+  padding:40px 40px 40px;
+}
+
+.freepeople{  
+  float:left;
+  
+  padding:20px 60px 10px;
+  
+
+}
+
 .schedule-rows td[data-selected],
 
 .schedule-rows td[data-selecting] { background-color: #E74C3C; }

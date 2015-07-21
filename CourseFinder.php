@@ -40,17 +40,12 @@
             use Facebook\HttpClients\FacebookHttpable;
 
             session_start();  // start the session so we can save stuff...
-            // start here by checking the facebook login information...
 
-
-// if we have the session then we dont have to go through this again... 
             if (!isset($_SESSION['PICTURE'])){
 
             FacebookSession::setDefaultApplication('857265011029343', '6895d874134fec6bfe666c55de5d4034'); 
             $helper = new FacebookRedirectLoginHelper('http://localhost/CourseMatch/CourseFinder.php');
-            // use this facebook login and just display the users name and hopefully profile picture...
-
-                // here we need to create the session... 
+ 
                     try {
                   $session = $helper->getSessionFromRedirect();
                 } catch( FacebookRequestException $ex ) {
@@ -123,29 +118,21 @@ echo "</div>";
 
 <?php
 
-/*
-<input list="browsers" name="browser">
-<datalist id="browsers">
-  <option value="Internet Explorer">
-  <option value="Firefox">
-  <option value="Chrome">
-  <option value="Opera">
-  <option value="Safari">
-</datalist>*/
+// try to make this just a dropdown...
+
 
 echo '<form action="CourseFinder.php">
-  Term: <input list="term" name="term">
-  			<datalist id="term">
-  				<option value="Term 1">Term 1</option>
-  				<option value="Term 2">Term 2</option>
-  				<option value="Term 1-2">Term 1 & 2</option>
-				</datalist>
+  Term: <select name="term">
+				<option value="Term 1">Term 1</option>
+				<option value="Term 2">Term 2</option>
+				<option value="Term 1 & 2">Term 1&2</option>
+		</select>
   				<br>
-  Course Subject: <input type="text" name="CourseSubj"><br>
-  Course Number: <input type="text" name="CourseNumb"><br>
+  Course Subject: <input type="text" name="CourseSubj" placeholder="eg. ENGL or EN*" required><br>
+  Course Number: <input type="text" name="CourseNumb" placeholder="eg. 110 or 1*" required><br>
   <input type="submit" value="Search" >
 </form>';
-	
+
 
 
 	 if(isset($_GET['delete'])){
@@ -158,7 +145,6 @@ echo '<form action="CourseFinder.php">
  		 Course_Cart($course, $section, $type, $day, $start, $end, 'delete');
  	}
 
-	
 
  if(isset($_GET['add'])){
  	Chromephp::log("inside the add function");	
@@ -168,10 +154,10 @@ echo '<form action="CourseFinder.php">
  	$day = $_GET['day'];
  	$start = $_GET['start'];
  	$end = $_GET['end'];
-
      Course_Cart($course, $section, $type, $day, $start, $end, 'add');
  }
- 
+
+Course_Cart_Displayer(); 
 
 // if session variables are set and the button was pressed...
 
@@ -193,16 +179,9 @@ if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']) || isset($_SE
  	// save this to the session...
  	find_courses_and_display($course, $numb, $term);
 }else{
-// only one of these needs to run...
-
-	// check if the term got set here...
 
  if (isset($_GET['CourseSubj']) || isset($_GET['CourseNumb']) || isset($_GET['term'])) {
-	
-	//Chromephp::log("wow");
- 	//Chromephp::log($_GET['CourseSubj']);
- 	//Chromephp::log($_GET['CourseNumb']); 
- 	// save the courses to the session and we can just render them again...
+
  	$term = $_GET['term'];
  	$course = $_GET['CourseSubj'];
  	$numb = $_GET['CourseNumb'];
@@ -215,13 +194,11 @@ if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']) || isset($_SE
  }
 }
 
+
+
+
 // this function is going to find the courses and display them...
 function find_courses_and_display($CourseSubj, $CourseNumb, $term){
-
-
-// term is not working right now because we might be posting the wrong type...
-Chromephp::log($term);
-
 
 
 $url = 'https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=sectsearch';
@@ -251,17 +228,41 @@ curl_close ($ch);
 
 //echo $output;
 
-// we have to go through the entire output html to find the courses that actually need to be taken... 
-
-
+//Chromephp::log($output);
 // we need to place this in the loop....
-$outputSplit = explode('<A NAME="search_results"></A>', $output);
 
-//Chromephp::log($outputSplit[1]);
+
+// we need to check if we have this line in the output.
+if(strpos($output,'<A NAME="search_results"></A>') == false){
+
+	Chromephp::log("the page returned no results");
+
+	echo "<div float:right>
+			<p align='center' style='color:red' >No Courses Found!</p>
+			<p align='center' style='color:red' >Make sure you entered the right course subject and course number!</p>
+		</div>";
+
+
+
+}else{
+
+	echo "<p align='center' style='color:blue; font-size: 200%'>Search Results</p>";
+
+	results_returned($output, $CourseSubj, $CourseNumb, $term);
+
+}
+}
+
+
+
+
+// handles the html page when search results are returned!!.
+function results_returned($output, $CourseSubj, $CourseNumb, $term){
+	
+$outputSplit = explode('<A NAME="search_results"></A>', $output);
 
 $outputSplit = explode('<!-- end of Main Content -->', $outputSplit[1]);
 
-//Chromephp::log($outputSplit[0]);
 $outputSplit = explode('<tr', $outputSplit[0]);
 
 // create one of these everytime and push into courses...
@@ -272,22 +273,16 @@ for($x = 2; $x < count($outputSplit); $x++){
 	//Chromephp::log($outputSplit[$x]);
 	$outputSplit1 = explode("$CourseSubj", $outputSplit[$x]); // this takes away the CPSC part...
 	
-	// now substring by three to get the section number... 
-	$outputSplit2 = substr($outputSplit1[2], 5);	// this is going to get rid of the course number... 
-	//Chromephp::log($outputSplit2);
-	// grab the section number first and then spit it up by <td>.... 
+	$outputSplit2 = substr($outputSplit1[2], 5);	
+	
 
 	$section = substr($outputSplit2, 0, 3); // this gets the section... 
 	$type = '';
 	$day = '';
 	$start = '';
 	$end = '';
-	// 
+	
 	$outputSplit3 = explode('<td>', $outputSplit2);
-
-	// we need to go through outputSplit 3 ... 
-
-	//Chromephp::log($outputSplit3);
 
 	for ($r = 0; $r < count($outputSplit3); $r++){
 
@@ -369,25 +364,20 @@ for($x = 2; $x < count($outputSplit); $x++){
 		}
 	}
 
-	//Chromephp::log($day);
-	//Chromephp::log($start);
-	//Chromephp::log($end);
 	$CourseParts = array (
-    "Section"  => $section,	// this will give the actual number 101, 102, l1b etc...
-    "Type" => $type,  // this will describe whether this is a lecture, lab, or waiting list.
+    "Section"  => $section,	
+    "Type" => $type,  
     "Day"   => $day, 
-    "Start" => $start, // this will hold the time at which this course is being held...
+    "Start" => $start, 
     "End" => $end
 	);
 
-	//Chromephp::log($CourseParts);
+
 	array_push($Courses, $CourseParts); 
-//	Chromephp::log($Courses);	 
+
 }
 
-// now we need to call something that will display this info for us... 
 CourseDisplayer($Courses, $CourseSubj, $CourseNumb);
-
 }
 
 // this should maybe be javascript later on... but for now use php...
@@ -448,7 +438,7 @@ function CourseDisplayer($courses, $coursesubj, $coursenumb){
 function Course_Cart($Course, $currentsection, $currenttype, $currentday, $currentstart, $currentend, $option){
 	// now lets show this... 
 	
-	echo "Courses Cart: ";
+	//echo "Courses Cart: ";
 
 	if(isset($_SESSION["cart"])){
 		// if it set then what we do is we add onto the cart
@@ -493,7 +483,7 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 
 		$_SESSION["cart"] = $cart;
 
-		Course_Cart_Displayer();
+		//Course_Cart_Displayer();
 
 
 		}else{
@@ -519,7 +509,7 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 				
 				$_SESSION["cart"] = $cart;
 
-				Course_Cart_Displayer();
+				//Course_Cart_Displayer();
 		}
 }
 
@@ -527,11 +517,30 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 // this displays the course displayer...
 function Course_Cart_Displayer(){
 
+
+	echo "<p align= 'center' style='font-size: 200%; color:blue'>Courses Selected</p>";
+
 	$cart = $_SESSION['cart'];
 	//Chromephp::log($cart);
 
-	echo "<table>";
+	echo "<table border='1' style='width:100%''>";
 
+	echo "<tr>
+				<td>Course</td>
+				<td>Section</td>
+    			<td>Type</td> 
+    			<td>Day</td>
+    			<td>Start Time</td>
+    			<td>End Time</td>
+  			</tr> ";
+
+  	Chromephp::log($cart);
+  	Chromephp::log(count($cart));
+
+  	if(count($cart) == 0){
+  		Chromephp::log("there are no courses selected");	
+  	}
+  		
 	for($x = 0; $x < count($cart); $x++){
 
 		//Chromephp::log($x);	

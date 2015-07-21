@@ -214,6 +214,7 @@ var listContainer;
 if(document.getElementById('freepeople') == null) {
      listContainer = document.createElement("div");
       listContainer.id = "freepeople";
+    //  listContainer.className = "freepeople";
       }else{
                    listContainer = document.getElementById('freepeople');
                     listContainer.innerHTML = "";
@@ -240,8 +241,7 @@ if(document.getElementById('freepeople') == null) {
     sending_through_array.push(array_times_selected[x].getAttribute('data-day'));
   }
 
-  console.log(sending_through_array);
-  // we check that if the list is empty then we need to just completely delete this list.
+
   var object =  $.ajax({
                 type: "POST",
                 url: "WhosFree.php",   // maybe have to make another url here...
@@ -251,15 +251,12 @@ if(document.getElementById('freepeople') == null) {
                 success: function (obj, textstatus) {
                 
                   var listData = html_to_list(obj);
-                  console.log(listData);
-
-                 
-                    //listContainer = document.getElementById('freepeople');
-                    console.log(listContainer);
-                  document.getElementsByTagName("body")[0].appendChild(listContainer); 
-                   
+                  
+                  //document.getElementsByTagName("body")[0].appendChild(listContainer); 
+                  console.log(document.getElementsByClassName("day-schedule-selector"));
+                  document.getElementsByClassName("day-schedule-selector")[0].appendChild(listContainer); 
                   var listElement = document.createElement("ul"); 
-
+                    listElement.className = 'freepeople';
                   listContainer.appendChild(listElement);
                     var numberOfListItems = listData.length;
 
@@ -276,7 +273,6 @@ if(document.getElementById('freepeople') == null) {
                   }
             });
 }
-
 
 function html_to_list(html){
 
