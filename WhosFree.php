@@ -73,8 +73,6 @@
 
                   $response = $request ->execute();
 
-                  // get the response... 
-
                    $graphObject = $response->getGraphObject();
                    $fbid = $graphObject->getProperty('id');              // To Get Facebook ID
                    $fbfullname = $graphObject->getProperty('name'); // To Get Facebook full name
@@ -162,6 +160,7 @@ if(isset($_POST['functionname'])){
 
 function whosfree($arguments){
 
+
   $db = "CourseMatcher";
     $servername = "localhost";
     $username = "root";
@@ -193,6 +192,7 @@ function whosfree($arguments){
           $courses = $row["Courses"];
       }
   }
+
 
   $friends = explode(', ', $friends);
   
@@ -264,7 +264,7 @@ function whosfree($arguments){
     }
 
     //Chromephp::log($array_of_time);
-
+    Chromephp::log("this is running");
     $dayoncalendar;
     // first check the day here... 
     if($arguments[1] == 0){
@@ -291,7 +291,9 @@ function whosfree($arguments){
     if ($dayoncalendar == $day){
     for ($g = 0; $g < count($arguments); $g++){
       //Chromephp::log($arguments[$g]); 
+      
       for($k = 0; $k < count($array_of_time); $k++){
+
         if($array_of_time[$k] == $arguments[$g]){
           array_push($conflicting_friends, $current_friend_name);
           break 3;
@@ -301,23 +303,19 @@ function whosfree($arguments){
   }
   }
 }
-  //Chromephp::log($conflicting_friends);
-  // we have to add everyone that is free so everyone that is not in this list here... 
-
-  $returning_friends = $friends;  // this is going to be the list of friends that we are returning.
+  Chromephp::log($conflicting_friends);
+ 
+  $returning_friends = $friends;  
 
   for($e = 0; $e < count($friends); $e++){
     
-    // we go through the conflicting friendslist...
     for ($p = 0; $p < count($conflicting_friends); $p++){
-      //Chromephp::log("inside the second loop");
-      
-
+    
       if($friends[$e] == $conflicting_friends[$p]){
         // Chromephp::log('inside the if statement'); 
         unset($returning_friends[$e]); // the question is do we unset the original instance of friends..
        // Chromephp::log($friends);
-      //  Chromephp::log($returning_friends);
+     //   Chromephp::log($returning_friends);
         // then we take that out of returning friends.
       }
     }

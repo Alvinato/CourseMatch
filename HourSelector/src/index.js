@@ -253,7 +253,7 @@ if(document.getElementById('freepeople') == null) {
                   var listData = html_to_list(obj);
                   
                   //document.getElementsByTagName("body")[0].appendChild(listContainer); 
-                  console.log(document.getElementsByClassName("day-schedule-selector"));
+                  //console.log(document.getElementsByClassName("day-schedule-selector"));
                   document.getElementsByClassName("day-schedule-selector")[0].appendChild(listContainer); 
                   var listElement = document.createElement("ul"); 
                     listElement.className = 'freepeople';

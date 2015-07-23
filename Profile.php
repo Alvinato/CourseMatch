@@ -14,7 +14,7 @@
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
-    <link href="bootstrap-social/bootstrap-social.less" rel="stylesheet">
+    
     <link href="bootstrap-social/bootstrap-social.css" rel="stylesheet">
     <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
@@ -24,13 +24,9 @@
 
   <div>
     <?php
-            // this is going to take in the info about the courses and its going to save it to the users profile and display it properly... 
         include 'ChromePhp.php';
-        //define('FACEBOOK_SDK_V4_SRC_DIR', '/path/to/fb-php-sdk-v4/src/Facebook/');
         require __DIR__ . '/facebook-php-sdk/autoload.php';
-        //require __DIR__ . '/facebook-php-sdk/src/Facebook/FacebookSession.php'
-        //require_once 'autoload.php';
-
+    
         use Facebook\FacebookSession;
         use Facebook\FacebookRedirectLoginHelper;
         use Facebook\FacebookRequest;
@@ -45,7 +41,6 @@
 
 
         session_start();
-
 
 
         if (isset($_SESSION['PICTURE'])){
@@ -100,12 +95,6 @@
                       } 
 
                       $_SESSION['FRIENDS'] = $friendsString;
-                      // now lets get the photo so we can display it... 
-
-
-                      // with all this facebook information we need to save the courses that he is taking here... 
-
-                     // Save_Courses_to_User($fbid, $fbfullname, $femail, $friendsString);
 
                         $_SESSION['PICTURE']= $profile_pic = "http://graph.facebook.com/".$fbid."/picture";
                         echo "<div>";               
@@ -147,34 +136,38 @@
 
 <?php
 
-// what this does... saves the courses from the previous page. gets the user that is currently logged in and then saves it...
+
+if(isset($_GET['remove'])){
+          $course = $_GET['$course'];
+          Chromephp::log($course);
+          Chromephp::log("the delete button was pressed here!!");
+          echo "this is being called";
+        }
 
 
-Save_Courses_to_User($_SESSION['FBID'], $_SESSION['FULLNAME'], $_SESSION['EMAIL'], $_SESSION['FRIENDS']);
+$name = $_SESSION['FULLNAME'];
+$name_array = explode(' ', $name);
+$_SESSION['firstname'] = $firstname = $name_array[0];
+$_SESSION['lastname']= $lastname = $name_array[1];
 
 
-if(isset($_GET['SaveCourses'])){
+  //Chromephp::log($_GET['remove']);
+  //Chromephp::log($_POST['remove']);
+ //if(isset($_POST['remove'])){
+ // Chromephp::log("the remove button has been pressed");
+// }
+  
+ 
 
-  Chromephp::log($_GET['cart']);
-  $_SESSION['SaveCourses'] = $_GET['cart'];
-
-}
+gather_user_courses();
 
 
 
-// save the user data to the user...
-function Save_Courses_to_User($fbid, $fbfullname, $femail, $friendstring){
+ 
+// this function is going to gather the courses of the user
+function gather_user_courses(){ 
 
-	if(isset($_SESSION['SaveCourses'])){
-
-    $cart = $_SESSION['SaveCourses'];
-	
-    $nameString = explode(' ',$fbfullname);
-    $firstname = $nameString[0];
-    $lastname = $nameString[1];
-
-    
-    $db = "CourseMatcher";
+  $db = "CourseMatcher";
     $servername = "localhost";
     $username = "root";
     $password = "";
@@ -186,40 +179,82 @@ function Save_Courses_to_User($fbid, $fbfullname, $femail, $friendstring){
       die("Connection failed: " . $conn->connect_error);
     } 
 
-      $sql = " UPDATE Users
-      SET courses='$cart'
-      WHERE email='$femail'";
+  $firstname = $_SESSION['firstname'];
+  $lastname = $_SESSION['lastname'];
+  $sql = "SELECT Courses FROM Users WHERE firstname= '$firstname' AND lastname= '$lastname'";
 
-      if ($conn->query($sql) === TRUE) {
-        echo "We have updated successfully";
-        } else {
-        echo "Error Updating " . $conn->error;
+   $result = $conn->query($sql);
+     
+      if ($result->num_rows > 0) {  
+        while($row = $result->fetch_assoc()) {
+           $user_courses = $row['Courses'];  
+           $course_object = json_decode($user_courses);
+           $_SESSION['user_courses'] = $course_object; // this holds the user courses...
+        }
       }
-		}
 
-    find_friend_matches($friendstring, $cart, $conn);
-
-
-	}
+      friend_matches($conn);
+}
 
 
-function find_friend_matches($friendstring, $courses, $conn){
+function friend_matches($conn){
+  $firstname = $_SESSION['firstname'];
+  $lastname = $_SESSION['lastname'];
+  $friendstring = $_SESSION['FRIENDS'];
+  $courses_array = $_SESSION['user_courses'];
+  $friends_array = explode(', ' , $friendstring);
+  for($r = 0; $r < count($courses_array); $r++){
+    $current_course = $courses_array[$r];
+    $current_course_string = json_encode($current_course);
+   
+    echo "<table border='1' style='width:100%''>";
+    
+    echo "<tr>
+              <td>Course</td>
+              <td>Section</td>
+              <td>Type</td> 
+              <td>Day</td>
+              <td>Start Time</td>
+              <td>End Time</td>
+          </tr>";
 
-$courses_array = json_decode($courses);
-$friends_array = explode(', ' , $friendstring);
+  $course = $current_course->course;
+  $section = $current_course->section;
+  $type = $current_course->type;
+  $start = $current_course->currentstart;
+  $end = $current_course->currentend ;
+  $day = $current_course->currentday;
+      echo"<tr> 
+        <td>$course</td>
+          <td>$section</td> 
+          <td>$type</td>
+          <td>$day</td>
+          <td>$start</td>
+          <td>$end</td>
+          <td> 
+            <form action= 'ProfileHelper.php'>  
+            <input type='hidden' name='course' value =$course />
+            <input type='hidden' name='section' value =$section />
+            <input type='hidden' name='type' value =$type />
+            <input type='hidden' name='day' value =$day />
+            <input type='hidden' name='start' value =$start />
+            <input type='hidden' name='end' value =$end />
+            <input type='hidden' name='firstname' value =$firstname/>
+            <input type='hidden' name='lastname' value =$lastname/>
+            <input type='submit' name = 'remove' value='Remove'></button> 
+            </form>
+          </td>  
+        </tr>";
+// we could try calling another function and having the page reload again...
 
-for($r = 0; $r < count($courses_array); $r++){
-
-  Chromephp::log("inside the first loop right now");
-
-  $current_course = $courses_array[$r];
-  $current_course_string = json_encode($current_course);
+        // inside this table we are going to list every friend that is matched wit it
+     echo "<tr>
+              <td>Matched Friends---->>></td>
+              <td>
+                <ul>";
   
-  // here lets create the starts of a list tag...
-
-  echo "<h2>$current_course_string</h2>";
-  echo "<ul>";
   for($x = 0; $x < count($friends_array); $x++){
+    //Chromephp::log("inside the friends loop right now");
     $current_friend = $friends_array[$x];
     $current_friend_name_array = explode(' ', $current_friend);
     $current_friend_firstname = $current_friend_name_array[0];
@@ -227,28 +262,27 @@ for($r = 0; $r < count($courses_array); $r++){
     $current_friend_courses;
       $sql = "SELECT Courses FROM Users WHERE firstname= '$current_friend_firstname' AND lastname= '$current_friend_lastname'";
       $result = $conn->query($sql);
+     // Chromephp::log($current_friend);
       if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
-          //echo $row['Courses'];
-          // go through each course in the friends and see if it matches this instance of course.
           $current_friend_courses = $row['Courses'];  
-          $current_friend_courses_string = json_encode($current_friend_courses);
-          $current_friend_courses = str_replace(array('[',']'), '',$current_friend_courses);
-          
-            if ($current_course_string == $current_friend_courses){
-              // we need to take that friend and the course that he is matched with... 
-
-              echo "<li>$current_friend</li>";
-              
-            }
+          $current_friend_courses = json_decode($current_friend_courses);
+           for ($i=0; $i < count($current_friend_courses); $i++){
+        //    Chromephp::log($current_friend_courses[$i]);
+            $friend_course_string = json_encode($current_friend_courses[$i]);
+                 if ($current_course_string == $friend_course_string){
+                       echo "<li>$current_friend</li>";
+              }  
+           }
        
          }
       } 
     }
-  echo "</ul>";
-
+      echo "      </ul>
+                </td>
+                 </tr>
+            </table>";
   }
-
 }
 ?>
 

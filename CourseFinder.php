@@ -73,12 +73,31 @@
 
                      /* ---- Session Variables -----*/
                      $_SESSION['FBID'] = $fbid;           
-                        $_SESSION['FULLNAME'] = $fbfullname;
+                     $_SESSION['FULLNAME'] = $fbfullname;
+                     //$name = explode(' ', $fbfullname);
+    				 //$_SESSION['firstname'] = $name[0];
+    				 //$_SESSION['lastname'] = $name[1];
                      $_SESSION['EMAIL'] =  $femail;
 
-                    
+                     $friends = (new FacebookRequest( $session, 'GET', '/me/friends' ))->execute()->getGraphObject()->asArray();
+                  
+
+                    $friendsString = ''; // use this string to save into the friendslist...
+
+                    $sizeofFriendlist = count($friends['data']);
+
+                    for($x = 0; $x < $sizeofFriendlist; $x++){
+                        $currentFriend = $friends['data'][$x]->name;
+                        if ($friendsString == ''){
+                            $friendsString = $currentFriend;
+                              continue;
+                        }
+                        $friendsString = $friendsString.', '.$currentFriend;
+                      } 
+
+                      $_SESSION['FRIENDS'] = $friendsString;
                     //create the url... 
-				$_SESSION['PICTURE']= $profile_pic = "http://graph.facebook.com/".$fbid."/picture";
+					$_SESSION['PICTURE']= $profile_pic = "http://graph.facebook.com/".$fbid."/picture";
                         echo "<div>";               
                         echo "<img src=\"" . $profile_pic . "\" />"; 
 
@@ -133,9 +152,76 @@ echo '<form action="CourseFinder.php">
   <input type="submit" value="Search" >
 </form>';
 
+	
+	
+	if(isset($_GET['SaveCourses'])){
+		// here we are going to update the profile db!!
+		// the profile page is going to be the page that finds your matches...
+  		//Chromephp::log($_GET['cart_stuff']);
+  		$_SESSION['cart_stuff'] = $_GET['cart_stuff'];
+  		Save_Courses($_SESSION['FBID'], $_SESSION['FULLNAME'], $_SESSION['EMAIL'], $_SESSION['FRIENDS']);
+	}
 
 
-	 if(isset($_GET['delete'])){
+// saves the courses to user.
+function Save_Courses($fbid, $fbfullname, $femail, $friendstring){
+
+	// thus when he saves and we update we can just append the strings.
+	// gather the course string that he has saved to his profile...
+	// append the cart string onto it then update
+	// then clear the cart and display it on screens  --->>> still need to do this part...
+
+	$db = "CourseMatcher";
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+    $update_string = '';
+    $conn = new mysqli($servername, $username, $password, $db);
+     // Check connection
+    if ($conn->connect_error) {
+      die("Connection failed: " . $conn->connect_error);
+    } 
+    $name = explode(' ', $fbfullname);
+    $firstname = $name[0];
+    $lastname = $name[1];
+    $sql = "SELECT Courses FROM Users WHERE firstname= '$firstname' AND lastname= '$lastname'";
+     $result = $conn->query($sql);
+     
+      if ($result->num_rows > 0) { 	
+      	while($row = $result->fetch_assoc()) {
+      		 $user_courses = $row['Courses'];  
+          	$course_object = json_decode($user_courses); // these are the courses that are retrieved from the server.
+          	$cart = $_SESSION['cart_stuff'];
+          	$cart = json_decode($cart);
+          	if(is_null($course_object)){ 
+          		$update_string = json_encode($cart);
+          	}else{
+          		for ($k = 0; $k < count($cart); $k++){
+          			array_push($course_object, $cart[$k]);
+          		}
+          	$update_string = json_encode($course_object);
+          }
+      	}
+      }
+
+      $sql = " UPDATE Users
+      SET courses='$update_string'
+      WHERE email='$femail'";
+
+      if ($conn->query($sql) === TRUE) {
+        Chromephp::log("we have updated successfully");
+        } else {
+        Chromephp::log( "Error Updating " . $conn->error);
+      }
+	
+
+	// we need to delete the cart session here...
+      $_SESSION['cart'] =[];
+	mysqli_close($conn);
+}
+
+
+	if(isset($_GET['delete'])){
 	 	$course = $_GET['course1'];
  		$section = $_GET['section1'];
  		$type = $_GET['type1'];
@@ -147,7 +233,6 @@ echo '<form action="CourseFinder.php">
 
 
  if(isset($_GET['add'])){
- 	Chromephp::log("inside the add function");	
  	$course = $_GET['course'];
  	$section = $_GET['section'];
  	$type = $_GET['type'];
@@ -157,9 +242,9 @@ echo '<form action="CourseFinder.php">
      Course_Cart($course, $section, $type, $day, $start, $end, 'add');
  }
 
+
 Course_Cart_Displayer(); 
 
-// if session variables are set and the button was pressed...
 
 if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']) || isset($_SESSION['term']))
 {
@@ -213,13 +298,8 @@ if($ch === false)
 curl_setopt ($ch, CURLOPT_URL, $url);
 curl_setopt ($ch, CURLOPT_POST, true);
  
-// The submitted form data, encoded as query-string-style name-value pairs
-
-// this is the data that we need to post... 
-//Chromephp::log($CourseSubj);
-//Chromephp::log($CourseNumb);
 $post_data = "subj=$CourseSubj&crsno=$CourseNumb&term=$term";
-//$post_data = "subj=CPSC&crsno=304";
+
 curl_setopt ($ch, CURLOPT_POSTFIELDS, $post_data);
 curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
  
@@ -228,14 +308,10 @@ curl_close ($ch);
 
 //echo $output;
 
-//Chromephp::log($output);
-// we need to place this in the loop....
-
-
 // we need to check if we have this line in the output.
 if(strpos($output,'<A NAME="search_results"></A>') == false){
 
-	Chromephp::log("the page returned no results");
+	//Chromephp::log("the page returned no results");
 
 	echo "<div float:right>
 			<p align='center' style='color:red' >No Courses Found!</p>
@@ -383,10 +459,6 @@ CourseDisplayer($Courses, $CourseSubj, $CourseNumb);
 // this should maybe be javascript later on... but for now use php...
 function CourseDisplayer($courses, $coursesubj, $coursenumb){
 
-
-	//Chromephp::log($courses);
-
-	// we have to loop through all the courses... 
 		echo "<table border='1' style='width:100%''>";
 		// first lets creat the criteria rows first... 
 		echo "<tr>
@@ -432,16 +504,85 @@ function CourseDisplayer($courses, $coursesubj, $coursenumb){
 }
 
 
-// this is going to be the courses...
-// we need to save the session variables
-// one variable that says either it is a delete or it is an add...
-function Course_Cart($Course, $currentsection, $currenttype, $currentday, $currentstart, $currentend, $option){
-	// now lets show this... 
+
+
+function course_duplicate_checker($course, $section, $type, $day, $start, $end){
+
+	$db = "CourseMatcher";
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+
+    $conn = new mysqli($servername, $username, $password, $db);
+
+    // Check connection
+    if ($conn->connect_error) {
+      die("Connection failed: " . $conn->connect_error);
+    } 
+
 	
-	//echo "Courses Cart: ";
+	$fullname = $_SESSION['FULLNAME'];
+    $name = explode(' ', $fullname);
+    $firstname = $name[0];
+    $lastname = $name[1];
+     $sql = "SELECT Courses FROM Users WHERE firstname= '$firstname' AND lastname= '$lastname'";
+     $result = $conn->query($sql);
+     
+      if ($result->num_rows > 0) { 	
+      	while($row = $result->fetch_assoc()) {
+      		 $user_courses = $row['Courses'];  
+      		
+          	$course_object = json_decode($user_courses);
+          	
+          	// lets loop through this course object and makesure that we have no duplicates here... 
+
+          	for($f = 0; $f < count($course_object); $f++){
+        		
+          		// we have to check everyone of these now...
+          		if(
+        	  	$course_object[$f]->course == $course &&
+          		$course_object[$f]->type == $type &&	
+          		$course_object[$f]->currentday == $day &&
+          		$course_object[$f]->currentstart == $start &&
+          		$course_object[$f]->currentend == $end
+          		){
+
+          			echo '<script language="javascript">';
+					echo 'alert("You already have this course saved to your profile!")';
+					echo '</script>';
+          			return false;
+          		}
+          	}	
+      	}
+      }
+		
+	mysqli_close($conn);
+
+	$cart = $_SESSION['cart'];
+	for($x = 0; $x < count($cart); $x++){
+
+			if($cart[$x]['course'] == $course && 
+				$cart[$x]['section'] == $section &&
+				$cart[$x]['type'] == $type &&
+				$cart[$x]['currentday'] == $day &&
+				$cart[$x]['currentstart'] == $start &&
+				$cart[$x]['currentend'] == $end){
+				echo '<script language="javascript">';
+				echo 'alert("You cannot add this course twice to the list")';
+				echo '</script>';
+				return false;
+			}
+	}
+	return true;
+
+}
+
+
+
+// this function adds or deletes the course from the cart...
+function Course_Cart($Course, $currentsection, $currenttype, $currentday, $currentstart, $currentend, $option){
 
 	if(isset($_SESSION["cart"])){
-		// if it set then what we do is we add onto the cart
 
 		$cart = $_SESSION["cart"];
 		// then what we do is just add onto the cart... 
@@ -455,7 +596,11 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 				); 
 
 		if ($option == 'add'){
-		array_push($cart, $course_info_array);
+
+			$result = course_duplicate_checker($Course, $currentsection, $currenttype, $currentday, $currentstart, $currentend);	
+			if($result){	
+				array_push($cart, $course_info_array);
+			}	
 		}
 
 		
@@ -478,16 +623,10 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 
 			}
 
-			
-		//Chromephp::log($cart);
-
 		$_SESSION["cart"] = $cart;
 
-		//Course_Cart_Displayer();
-
-
 		}else{
-			// if its not set then we save it as a session variable... 
+			
 			$cart = [];
 			$course_info_array = array(
 				'course' => $Course,
@@ -509,7 +648,6 @@ function Course_Cart($Course, $currentsection, $currenttype, $currentday, $curre
 				
 				$_SESSION["cart"] = $cart;
 
-				//Course_Cart_Displayer();
 		}
 }
 
@@ -520,7 +658,11 @@ function Course_Cart_Displayer(){
 
 	echo "<p align= 'center' style='font-size: 200%; color:blue'>Courses Selected</p>";
 
+	if(isset($_SESSION['cart'])){
 	$cart = $_SESSION['cart'];
+	}else{
+		$cart = [];
+	}			
 	//Chromephp::log($cart);
 
 	echo "<table border='1' style='width:100%''>";
@@ -534,11 +676,10 @@ function Course_Cart_Displayer(){
     			<td>End Time</td>
   			</tr> ";
 
-  	Chromephp::log($cart);
-  	Chromephp::log(count($cart));
+  	
 
   	if(count($cart) == 0){
-  		Chromephp::log("there are no courses selected");	
+  		//Chromephp::log("there are no courses selected");	
   	}
   		
 	for($x = 0; $x < count($cart); $x++){
@@ -587,22 +728,15 @@ function Course_Cart_Displayer(){
 
 	$string_cart = json_encode($cart);
 
-	echo "<form action= 'Profile.php'>
-			<input type='hidden' name='cart' value ='$string_cart' />
-			<input type='submit' name = 'SaveCourses' value='Save'></button>
-			</form>";
+	echo "<form action= 'CourseFinder.php'>
+    			<input type='hidden' name='cart_stuff' value ='$string_cart' />
+				<input type='submit' name = 'SaveCourses' value='Save'></button>
+    		</form>";
+
 
 }
-/*
-					<form action= 'CourseFinder.php'>
-    				<input type='hidden' name='course' value =$Course />
-    				<input type='hidden' name='section' value =$currentsection />
-    				<input type='hidden' name='type' value =$currenttype />
-    				<input type='hidden' name='day' value =$currentday />
-    				<input type='hidden' name='start' value =$currentstart />
-    				<input type='hidden' name='end' value =$currentend />
-    				<input type='submit' name = 'delete' value='Add'></button> 
-    				</form>*/
+
+
 
 ?>
 
