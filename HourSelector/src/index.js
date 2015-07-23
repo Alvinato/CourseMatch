@@ -250,6 +250,8 @@ if(document.getElementById('freepeople') == null) {
 
                 success: function (obj, textstatus) {
                 
+
+
                   var listData = html_to_list(obj);
                   
                   //document.getElementsByTagName("body")[0].appendChild(listContainer); 
@@ -276,6 +278,8 @@ if(document.getElementById('freepeople') == null) {
 
 function html_to_list(html){
 
+
+  //console.log(html);
   var string = html.split('{"result":'); 
      string = string[1];
      string = string.split('}\n</div>');

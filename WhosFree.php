@@ -264,7 +264,7 @@ function whosfree($arguments){
     }
 
     //Chromephp::log($array_of_time);
-    Chromephp::log("this is running");
+
     $dayoncalendar;
     // first check the day here... 
     if($arguments[1] == 0){
@@ -291,7 +291,7 @@ function whosfree($arguments){
     if ($dayoncalendar == $day){
     for ($g = 0; $g < count($arguments); $g++){
       //Chromephp::log($arguments[$g]); 
-      
+
       for($k = 0; $k < count($array_of_time); $k++){
 
         if($array_of_time[$k] == $arguments[$g]){
@@ -303,6 +303,7 @@ function whosfree($arguments){
   }
   }
 }
+  Chromephp::log("this is the conflicting friend!!");
   Chromephp::log($conflicting_friends);
  
   $returning_friends = $friends;  
@@ -312,16 +313,16 @@ function whosfree($arguments){
     for ($p = 0; $p < count($conflicting_friends); $p++){
     
       if($friends[$e] == $conflicting_friends[$p]){
-        // Chromephp::log('inside the if statement'); 
-        unset($returning_friends[$e]); // the question is do we unset the original instance of friends..
-       // Chromephp::log($friends);
-     //   Chromephp::log($returning_friends);
-        // then we take that out of returning friends.
+   
+        unset($returning_friends[$e]); 
       }
     }
   }
-
-  return $returning_friends;
+  $real_array = [];
+  foreach($returning_friends as $value){
+    array_push($real_array, $value);
+  }
+  return $real_array;
 
 }
 
