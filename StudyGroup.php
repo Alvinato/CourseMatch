@@ -10,7 +10,8 @@
     <link rel="icon" href="../../favicon.ico">
 
     <title>Course-Match Homepage</title>
-
+  
+  
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
@@ -18,10 +19,30 @@
     <link href="bootstrap-social/bootstrap-social.css" rel="stylesheet">
     <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
-     <link href="bootstrap-calendar/css/calendar.css" rel="stylesheet">
-     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-	<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    
+     <link href="bootstrap-calendar/components/bootstrap3/css/bootstrap.min.css" rel="stylesheet">
+     <link href="bootstrap-calendar/components/bootstrap3/css/bootstrap-theme.min.css" rel="stylesheet">
+     <link href="bootstrap-calendar/components/bootstrap3/css/bootstrap-theme.css" rel="stylesheet">
+     <link href="bootstrap-calendar/css/calendar.min.css" rel="stylesheet">
+
+  <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="bootstrap-calendar/components/jquery/jquery.min.js"></script> 
+  <script type="text/javascript" src="bootstrap-calendar/components/bootstrap3/js/bootstrap.js"></script> 
+  <script type="text/javascript" src="bootstrap-calendar/components/bootstrap3/js/bootstrap.min.js"></script> 
+  
+  
+
 	<script src="underscore/underscore.js"></script>
+  <script type="text/javascript" src="bootstrap-calendar/js/language/ar-SA.js"></script>
+  <script type="text/javascript" src="bootstrap-calendar/components/jstimezonedetect/jstz.js"></script>
+  <script type="text/javascript" src="bootstrap-calendar/components/jstimezonedetect/jstz.js"></script>
+  
+   <script type="text/javascript" src="bootstrap-calendar/js/calendar.min.js"></script>    
+   
+     <link href="bootstrap-calendar/css/calendar.css" rel="stylesheet">
+     <link href="bootstrap-calendar/components/bootstrap3/css/bootstrap.css" rel="stylesheet">
+      
+
     </head>
 	<div>
 		 <?php
@@ -41,10 +62,7 @@
             use Facebook\HttpClients\FacebookHttpable;
 
             session_start();  // start the session so we can save stuff...
-            // start here by checking the facebook login information...
 
-
-// if we have the session then we dont have to go through this again... 
             if (!isset($_SESSION['PICTURE'])){
 
             FacebookSession::setDefaultApplication('857265011029343', '6895d874134fec6bfe666c55de5d4034'); 
@@ -121,32 +139,59 @@ echo "</div>";
 
 
 <body>
+   <div class="page-header">
 
-<!-- create the calendar here!!-->
-<div id="calendar"></div>
+    <div class="pull-right form-inline">
+      <div class="btn-group">
+        
+        <button class="btn btn-primary" data-calendar-nav="prev">&lt;&lt; Prev</button>
+        <button class="btn btn-default" data-calendar-nav="today">Today</button>
+        <button class="btn btn-primary" data-calendar-nav="next">Next &gt;&gt;</button>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-warning" data-calendar-view="year">Year</button>
+        <button class="btn btn-warning active" data-calendar-view="month">Month</button>
+        <button class="btn btn-warning" data-calendar-view="week">Week</button>
+        <button class="btn btn-warning" data-calendar-view="day">Day</button>
+      </div>
+    </div>
 
+    <h3>March 2013</h3>
     
-    <script type="text/javascript" src="bootstrap-calendar/js/calendar.js"></script>
+  </div>
+  <!-- create the calendar here!!-->
+ <div id="container"> 
+
+
+
+  <div id="calendar" class="row-fluid"></div>
+   
     
     <!-- we need a container here to make this calendar here smaller. --> 
-
     <script type="text/javascript">
+        
+        
         var calendar = $("#calendar").calendar(
+          
             {
                 tmpl_path: "bootstrap-calendar/tmpls/",
-                events_source: function () { return []; }
+                events_source: 'bootstrap-calendar/events.json.php',
             });         
+
     </script>
+
+
+</div>
+
+   <script type="text/javascript" src="bootstrap-calendar/js/calendar.js"></script>
+    <script type="text/javascript" src="bootstrap-calendar/js/app.js"></script>
+
 
 
 
 
 
 <?php
-
-// first show the calendar on the top left there...
-
-
 
 
 ?>

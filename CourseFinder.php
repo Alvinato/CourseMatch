@@ -141,6 +141,12 @@ echo "</div>";
 
 
 echo '<form action="CourseFinder.php">
+  School: <select name="School">
+          <option value="UBC">UBC</option>
+          <option value="SFU">SFU</option>
+           <option value="Langara">Langara</option>
+          </select>
+          <br> 
   Term: <select name="term">
 				<option value="Term 1">Term 1</option>
 				<option value="Term 2">Term 2</option>
@@ -153,7 +159,6 @@ echo '<form action="CourseFinder.php">
 </form>';
 
 	
-	
 	if(isset($_GET['SaveCourses'])){
 		// here we are going to update the profile db!!
 		// the profile page is going to be the page that finds your matches...
@@ -165,11 +170,6 @@ echo '<form action="CourseFinder.php">
 
 // saves the courses to user.
 function Save_Courses($fbid, $fbfullname, $femail, $friendstring){
-
-	// thus when he saves and we update we can just append the strings.
-	// gather the course string that he has saved to his profile...
-	// append the cart string onto it then update
-	// then clear the cart and display it on screens  --->>> still need to do this part...
 
 	$db = "CourseMatcher";
     $servername = "localhost";
@@ -214,10 +214,8 @@ function Save_Courses($fbid, $fbfullname, $femail, $friendstring){
         Chromephp::log( "Error Updating " . $conn->error);
       }
 	
-
-	// we need to delete the cart session here...
       $_SESSION['cart'] =[];
-	mysqli_close($conn);
+	     mysqli_close($conn);
 }
 
 
@@ -245,10 +243,15 @@ function Save_Courses($fbid, $fbfullname, $femail, $friendstring){
 
 Course_Cart_Displayer(); 
 
+  // lets set the session for the school that he is searching for right now...
+  if(isset($_GET['School'])){
+    $_SESSION['School'] = $_GET['School'];
+    }
 
+// if the courses have already been chosen... when we reload the page.
 if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']) || isset($_SESSION['term']))
 {
-	//Chromephp::log("the session variables has been set");
+
 	if (isset($_GET['CourseSubj']) || isset($_GET['CourseNumb']) || isset($_GET['term'])) {
 		$_SESSION['CourseSubj'] = $_GET['CourseSubj'];  // reset the session variables...
 		$_SESSION['CourseNumb'] = $_GET['CourseNumb'];
@@ -258,11 +261,16 @@ if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']) || isset($_SE
 	$course = $_SESSION['CourseSubj'];
  	$numb = $_SESSION['CourseNumb'];
  	$term = $_SESSION['term'];
- 	//Chromephp::log($course);
- 	//Chromephp::log($numb);
-
+ 	
  	// save this to the session...
- 	find_courses_and_display($course, $numb, $term);
+  if($_SESSION['School'] == 'UBC'){
+    find_courses_and_display($course, $numb, $term);
+  }
+  if($_SESSION['School'] == 'SFU'){
+    // this is going to be for the SFU course webpage... 
+    find_courses_and_display_SFU($course, $numb, $term);
+  }
+
 }else{
 
  if (isset($_GET['CourseSubj']) || isset($_GET['CourseNumb']) || isset($_GET['term'])) {
@@ -274,9 +282,140 @@ if(isset($_SESSION['CourseSubj'])|| isset($_SESSION['CourseNumb']) || isset($_SE
  	$_SESSION["CourseSubj"] = $course; 
  	$_SESSION["CourseNumb"] = $numb; 
  	$_SESSION['term'] = $term;
- 	find_courses_and_display($course, $numb, $term);
+
+
+  // this function is only going to run with UBC courses...
+  if($_SESSION['School'] == 'UBC'){
+    find_courses_and_display($course, $numb, $term);
+  }
+  if($_SESSION['School'] == 'SFU'){
+    find_courses_and_display_SFU($course, $numb, $term);
+  }
+ 	
  	
  }
+}
+
+
+
+// this function is going to find and display the SFU courses.
+// may have to submit a bunch of the hidden data on the webpage!!
+
+// this mght be the reason why this webpage just simply isnt returning anything!!...
+/*<div id="win0divPSHIDDENFIELDS" style="display:none"><input type="hidden" name="ICType" id="ICType" value="Panel">
+<input type="hidden" name="ICElementNum" id="ICElementNum" value="0">
+<input type="hidden" name="ICStateNum" id="ICStateNum" value="46">
+<input type="hidden" name="ICAction" id="ICAction" value="None">
+<input type="hidden" name="ICXPos" id="ICXPos" value="0">
+<input type="hidden" name="ICYPos" id="ICYPos" value="0">
+<input type="hidden" name="ResponsetoDiffFrame" id="ResponsetoDiffFrame" value="-1">
+<input type="hidden" name="TargetFrameName" id="TargetFrameName" value="None">
+<input type="hidden" name="GSrchRaUrl" id="GSrchRaUrl" value="None">
+<input type="hidden" name="FacetPath" id="FacetPath" value="None">
+<input type="hidden" name="ICFocus" id="ICFocus" value="">
+<input type="hidden" name="ICSaveWarningFilter" id="ICSaveWarningFilter" value="0">
+<input type="hidden" name="ICChanged" id="ICChanged" value="-1">
+<input type="hidden" name="ICResubmit" id="ICResubmit" value="0">
+<input type="hidden" name="ICSID" id="ICSID" value="kTlAcA+5RVTRC8aVeWfVOZn6WoA7GfHnEmjV72xkdDw=">
+<input type="hidden" name="ICActionPrompt" id="ICActionPrompt" value="false">
+<input type="hidden" name="ICTypeAheadID" id="ICTypeAheadID" value="">
+<input type="hidden" name="ICFind" id="ICFind" value="">
+<input type="hidden" name="ICAddCount" id="ICAddCount" value="">
+</div>*/
+
+function find_courses_and_display_SFU($CourseSubj, $CourseNumb, $term){
+  Chromephp::log("inside the SFU course searcher right now!!");
+  $userAgent=$_SERVER['HTTP_USER_AGENT'];
+  try{
+  $url3 = 'https://www.sfu.ca/students/enrollment/class-search.html';
+  $url4 = 'https://go.sfu.ca/psp/paprd/EMPLOYEE/EMPL/h/?tab=PAPP_GUEST';
+  $url = 'http://go.sfu.ca';
+  $url1 = 'https://go.sfu.ca/paprd/signon.html';
+  $url2 = "../psp/paprd/?cmd=login'";
+  $ch = curl_init();
+     
+  if($ch === false)
+    {
+    die('Failed to create curl object');
+    }
+ 
+  curl_setopt ($ch, CURLOPT_URL, $url2);
+  curl_setopt ($ch, CURLOPT_POST, true);
+ 
+  
+  
+  // Chromephp::log($post_data);
+  
+  
+  //curl_setopt ($ch, CURLOPT_POSTFIELDS, $post_data);
+    //$params=array(
+    
+  // );
+  // curl_setopt($ch, CURLOPT_POST, TRUE);
+  //curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+  curl_setopt($ch, CURLOPT_HTTPGET, 1);
+  curl_setopt($ch,CURLOPT_FOLLOWLOCATION,true);
+  curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+  curl_setopt($ch, CURLOPT_DNS_USE_GLOBAL_CACHE, false );
+  curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+  //curl_setopt($ch, CURLOPT_USERPWD, 'username:password');
+  curl_setopt($ch, CURLOPT_USERAGENT, "booyah!");
+
+  $output = curl_exec($ch);
+
+  if(FALSE === $output)
+    throw new Exception(curl_error($ch), curl_errno($ch));
+//  curl_error($ch);
+  curl_close ($ch);
+
+  // we can open a new webpage then grab the information from that webpage and then try and navigate through it.
+  //echo $output;
+
+  // couple options I can do here 
+  // 1.) try and make another window where we navigate through to the course search page
+  // 2.) hold off on the chromephp echo and wait maybe it will redirect and display correctly... 
+  // 3.) just try and use the course search page instead... 
+
+
+
+  // we can redirect the webpage back to localhost while getting all the information on the page? 
+
+//  header('Location: http://localhost/CourseMatch/CourseFinder.php?School=SFU&term=Term+1&CourseSubj=asdf&CourseNumb=sadf');
+
+
+  Chromephp::log("before the output");
+  sleep(1);
+  Chromephp::log($output);
+  // we need to search through the output here and go to the link that it redirects too...
+
+
+
+
+
+
+
+  Chromephp::log("after the output");
+}catch(Exception $e){
+  Chromephp::log("exception was thrown!!");
+  trigger_error(sprintf(
+        'Curl failed with error #%d: %s',
+        $e->getCode(), $e->getMessage()),
+        E_USER_ERROR);
+
+
+}
+
+  // win0 is the form name!!
+  // this is going to be the subject name.
+  // name="SSR_CLSRCH_WRK_SUBJECT_SRCH$0" id="SSR_CLSRCH_WRK_SUBJECT_SRCH$0" 
+
+  // <input type="text" name="SSR_CLSRCH_WRK_CATALOG_NBR$1" id="SSR_CLSRCH_WRK_CATALOG_NBR$1"
+  //name="CLASS_SRCH_WRK2_STRM$45$" id="CLASS_SRCH_WRK2_STRM$45$"
+  //<select name="SSR_CLSRCH_WRK_ACAD_CAREER$2" id="SSR_CLSRCH_WRK_ACAD_CAREER$2"  this is the type of classes we are searching.
+  //<a name="CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH" id="CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH" ptlinktgt="pt_peoplecode" tabindex="1035" href="javascript:submitAction_win0(document.win0,'CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH');" class="SSSBUTTON_CONFIRMLINK">Search</a>
+  // this is going to be the submit button post data i believe.
 }
 
 
@@ -307,23 +446,16 @@ $output = curl_exec($ch);
 curl_close ($ch);
 
 //echo $output;
-
 // we need to check if we have this line in the output.
 if(strpos($output,'<A NAME="search_results"></A>') == false){
-
-	//Chromephp::log("the page returned no results");
-
+  // this is if the ubc site returns no results... 
 	echo "<div float:right>
 			<p align='center' style='color:red' >No Courses Found!</p>
 			<p align='center' style='color:red' >Make sure you entered the right course subject and course number!</p>
 		</div>";
-
-
-
 }else{
-
+  // if the ubc site returns the correct results..
 	echo "<p align='center' style='color:blue; font-size: 200%'>Search Results</p>";
-
 	results_returned($output, $CourseSubj, $CourseNumb, $term);
 
 }
@@ -456,11 +588,10 @@ for($x = 2; $x < count($outputSplit); $x++){
 CourseDisplayer($Courses, $CourseSubj, $CourseNumb);
 }
 
-// this should maybe be javascript later on... but for now use php...
+
 function CourseDisplayer($courses, $coursesubj, $coursenumb){
 
 		echo "<table border='1' style='width:100%''>";
-		// first lets creat the criteria rows first... 
 		echo "<tr>
 				<td>Course</td>
 				<td>Section</td>
