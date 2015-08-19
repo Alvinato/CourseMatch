@@ -435,18 +435,11 @@ echo "</div>";
 
 
      <script>
-     // i need this function to run everytime the dropdown menu is changed.
+   
      function changeFunc(){ 
      var courses = document.getElementsByName("courses")[0];
      var selectedValue = courses.options[courses.selectedIndex].value;
    
-     // now from here we need to call the php function... through ajax!!!
-     // this php function is going to...
-     // 1.) grab the course info
-      // 2.) with that course info try and map it out onto the calendar 
-      // 3.) have the calendar refresh and display onto the page... 
-      
-      // this is going to be the ajax call
       var object =  $.ajax({
                 type: "POST",
                 url: "StudyGroup.php",   // maybe have to make another url here...
@@ -456,6 +449,9 @@ echo "</div>";
                 success: function (obj, textstatus) {
                 
                  // console.log("the function ran successfully!!");
+                 // here lets have the page refresh!... 
+                 location.reload(); 
+                 // we need this page to reload the page where the person was looking at on the calendar
 
                   }
             });
