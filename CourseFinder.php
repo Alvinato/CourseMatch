@@ -168,7 +168,8 @@ echo '<form action="CourseFinder.php">
 	}
 
 
-// saves the courses to user.
+//saves the courses to the user
+  // TODO!! bug we need to include all the days in the current day section!
 function Save_Courses($fbid, $fbfullname, $femail, $friendstring){
 
 	$db = "CourseMatcher";
@@ -192,6 +193,7 @@ function Save_Courses($fbid, $fbfullname, $femail, $friendstring){
       		 $user_courses = $row['Courses'];  
           	$course_object = json_decode($user_courses); // these are the courses that are retrieved from the server.
           	$cart = $_SESSION['cart_stuff'];
+            // we save it to the cart incorrectly!! 
           	$cart = json_decode($cart);
           	if(is_null($course_object)){ 
           		$update_string = json_encode($cart);
@@ -204,6 +206,7 @@ function Save_Courses($fbid, $fbfullname, $femail, $friendstring){
       	}
       }
 
+      Chromephp::log($update_string);
       $sql = " UPDATE Users
       SET courses='$update_string'
       WHERE email='$femail'";
@@ -229,7 +232,7 @@ function Save_Courses($fbid, $fbfullname, $femail, $friendstring){
  		 Course_Cart($course, $section, $type, $day, $start, $end, 'delete');
  	}
 
-
+// we are not passing the full day through!!
  if(isset($_GET['add'])){
  	$course = $_GET['course'];
  	$section = $_GET['section'];
@@ -237,6 +240,8 @@ function Save_Courses($fbid, $fbfullname, $femail, $friendstring){
  	$day = $_GET['day'];
  	$start = $_GET['start'];
  	$end = $_GET['end'];
+  Chromephp::log("this is going to be the day!!");
+  Chromephp::log($day);
      Course_Cart($course, $section, $type, $day, $start, $end, 'add');
  }
 
@@ -590,7 +595,7 @@ CourseDisplayer($Courses, $CourseSubj, $CourseNumb);
 
 
 function CourseDisplayer($courses, $coursesubj, $coursenumb){
-
+  
 		echo "<table border='1' style='width:100%''>";
 		echo "<tr>
 				<td>Course</td>
@@ -600,15 +605,21 @@ function CourseDisplayer($courses, $coursesubj, $coursenumb){
     			<td>Start Time</td>
     			<td>End Time</td>
   			</tr> ";
+    //    Chromephp::log("inside the course displayer right now");
 	for($x = 0; $x < count($courses); $x++){
+
 		$currentsection = $courses[$x]['Section'];
 		$currenttype = $courses[$x]['Type'];
 		$currentday = $courses[$x]['Day'];
+    // this is going to trm the spaces and then send over the string to the course cart!!..
+    $currentday = str_replace(' ', ',', $currentday);
 		$currentstart = $courses[$x]['Start'];
 		$currentend = $courses[$x]['End'];
 		$Course = $coursesubj.$coursenumb;
+
 		// we also need to add a button to each row here... and this will add the course to the persons course cart...
 		// have the button add the row to the added column...
+
 		echo "<tr> 
 				<td>$Course</td>
     			<td>$currentsection</td> 
@@ -816,9 +827,8 @@ function Course_Cart_Displayer(){
 	for($x = 0; $x < count($cart); $x++){
 
 		//Chromephp::log($x);	
-		//Chromephp::log($cart[$x]);
+		//Chromephp::log($cart);
 		if(is_null($cart[$x])){
-
 			continue;
 		}
 		$currentCourse = $cart[$x]; 
@@ -830,9 +840,8 @@ function Course_Cart_Displayer(){
 		$currentstart1 = $currentCourse['currentstart'];
 		$currentend1 = $currentCourse['currentend'];
 		
-
+    
 		
-		// we need to create a delete button here...
 		echo "<tr> 
 				<td>$Course1</td>
     			<td>$currentsection1</td> 
