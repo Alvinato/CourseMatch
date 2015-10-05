@@ -460,3 +460,152 @@ var object =  $.ajax({
             });
 
 }
+
+
+/*
+echo '<form action="CourseFinder.php">
+  Term: <input list="term" name="term">
+        <datalist id="term">
+          <option value="Term 1">Term 1</option>
+          <option value="Term 2">Term 2</option>
+          <option value="Term 1-2">Term 1 & 2</option>
+        </datalist>
+          <br>
+  Course Subject: <input type="text" name="CourseSubj"><br>
+  Course Number: <input type="text" name="CourseNumb"><br>
+  <input type="submit" value="Search" >
+</form>';*/
+  
+
+
+
+  // $current_friend_courses_string = json_encode($current_friend_courses);
+         // $current_friend_courses = str_replace(array('[',']'), '',$current_friend_courses);
+           // Chromephp::log("these are the friends courses");
+           // Chromephp::log($current_friend_courses);
+            //Chromephp::log("this is the current users courses ");
+            //Chromephp::log($current_course_string);
+
+            // we need one more loop here to go through the students list!! 
+            //$current_friend_courses = explode(',',$current_friend_courses); // we
+
+            //for ($i=0; $i < count($current_friend_courses); $i++){
+            //  Chromephp::log($current_friend_courses[$i]);
+            //    if ($current_course_string == $current_friend_courses[$i]){
+            //           echo "<li>$current_friend</li>";
+              
+             //    }
+          //  }
+
+          / TODO!! --------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   value for the courses..."ACMA"
+  // TODO!! ----->> the search button id...  UGRD
+  //$post_data = "SSR_CLSRCH_WRK_SUBJECT_SRCH$0=$CourseSubj&SSR_CLSRCH_WRK_CATALOG_NBR$1=$CourseNumb&CLASS_SRCH_WRK2_STRM$45$=$SFU_term";
+  
+  $post_data['ICElementNum'] = '0';
+  $post_data['ICStateNum'] = '46';
+  $post_data['ICAction'] = 'None';
+  $post_data['ICXPos'] = '0';
+  $post_data['ICYPos'] = '0';
+  $post_data['ResponsetoDiffFrame'] = '-1';
+  $post_data['TargetFrameName'] = 'None';
+  $post_data['GSrchRaUrl'] = 'None';
+  $post_data['FacetPath'] = 'None';
+  $post_data['ICFocus'] = '';
+  $post_data['ICSaveWarningFilter'] = '0';
+  $post_data['ICChanged'] = '-1';
+    $post_data['ICResubmit'] = '0';
+    $post_data['ICSID'] = 'kTlAcA+5RVTRC8aVeWfVOZn6WoA7GfHnEmjV72xkdDw=';
+    $post_data['ICActionPrompt'] = 'false';
+    $post_data['ICTypeAheadID'] = '';
+    $post_data['ICFind'] = '';
+    $post_data['ICAddCount'] = '';
+    // this is the end of the hidden data.. now we need to post the other data...
+    $post_data['CLASS_SRCH_WRK2_STRM$45$'] = '1157';    
+    $post_data['SSR_CLSRCH_WRK_SUBJECT_SRCH$0'] = 'ACMA';
+    $post_data['SSR_CLSRCH_WRK_CATALOG_NBR$1'] = '';  
+    $post_data['SSR_CLSRCH_WRK_SSR_OPEN_ONLY$chk$3'] = 'Y';    
+    $post_data['SSR_CLSRCH_WRK_SSR_OPEN_ONLY$3'] = 'Y';    
+
+
+
+
+
+
+    {
+  "success": 1,
+  "result": [
+    {
+      "id": "293",
+      "title": "This is warning class event with very long title to check how it fits to evet in day view",
+      "url": "http://www.example.com/",
+      "class": "event-warning",
+      "start": "1437634800000",
+      "end":   "1438153200000"
+    },
+    {
+      "id": "256",
+      "title": "Event that ends on timeline",
+      "url": "http://www.example.com/",
+      "class": "event-warning",
+      "start": "1363155300000",
+      "end":   "1363227600000"
+    },
+    {
+      "id": "276",
+      "title": "Short day event",
+      "url": "http://www.example.com/",
+      "class": "event-success",
+      "start": "1363245600000",
+      "end":   "1363252200000"
+    },
+    {
+      "id": "294",
+      "title": "This is information class ",
+      "url": "http://www.example.com/",
+      "class": "event-info",
+      "start": "1363111200000",
+      "end":   "1363284086400"
+    },
+    {
+      "id": "297",
+      "title": "This is success event",
+      "url": "http://www.example.com/",
+      "class": "event-success",
+      "start": "1363234500000",
+      "end":   "1363284062400"
+    },
+    {
+      "id": "54",
+      "title": "This is simple event",
+      "url": "http://www.example.com/",
+      "class": "",
+      "start": "1363712400000",
+      "end":   "1363716086400"
+    },
+    {
+      "id": "532",
+      "title": "This is inverse event",
+      "url": "http://www.example.com/",
+      "class": "event-inverse",
+      "start": "1364407200000",
+      "end":   "1364493686400"
+    },
+    {
+      "id": "548",
+      "title": "This is special event",
+      "url": "http://www.example.com/",
+      "class": "event-special",
+      "start": "1363197600000",
+      "end":   "1363629686400"
+    },
+    {
+      "id": "295",
+      "title": "Event 3",
+      "url": "http://www.example.com/",
+      "class": "event-important",
+      "start": "1364320800000",
+      "end":   "1364407286400"
+    }
+  ]
+}
+
